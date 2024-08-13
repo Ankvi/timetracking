@@ -1,5 +1,6 @@
 import { join, resolve } from "node:path";
 import { $, connect } from "bun";
+import type { ObjectEnum } from "../types";
 
 type Instance = {
 	instance: string;
@@ -7,6 +8,14 @@ type Instance = {
 	pid: number;
 	wl_socket: string;
 };
+
+// Retrieved from https://wiki.hyprland.org/IPC/
+const EventName = {
+	ActiveWindow: "activewindow",
+	ActiveWindowV2: "activewindowv2",
+} as const;
+
+type EventName = ObjectEnum<typeof EventName>;
 
 export async function connectToSocket() {
 	const instances: Instance[] = await $`hyprctl instances -j`.json();
@@ -31,10 +40,12 @@ export async function connectToSocket() {
 	const socket = await connect({
 		socket: {
 			data: (socket, data) => {
-				const [event, payload] = data.toString("utf8").split(">>", 1);
-				console.log("Received event:");
-				console.log(event);
+				const payload = data.toString("utf8");
+				const events = payload.split("\n");
+				// const event = data.toString("utf8", 0, data.length);
+
 				console.log(payload);
+				// console.log(payload);
 			},
 		},
 		unix: socketPath,
