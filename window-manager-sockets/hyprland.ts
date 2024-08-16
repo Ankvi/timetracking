@@ -39,6 +39,9 @@ export async function connectToSocket() {
 
 	const socket = await connect({
 		socket: {
+			open: () => {
+				console.log("hyprland socket opened");
+			},
 			data: (socket, data) => {
 				const payload = data.toString("utf8");
 				const events = payload.split("\n");
@@ -47,9 +50,14 @@ export async function connectToSocket() {
 				console.log(payload);
 				// console.log(payload);
 			},
+			close: () => {
+				console.log("hyprland socket closed");
+			},
 		},
 		unix: socketPath,
 	});
+
+	console.log("Connected to hyprland socket");
 
 	process.on("SIGINT", () => socket.terminate());
 	process.on("SIGTERM", () => socket.terminate());
