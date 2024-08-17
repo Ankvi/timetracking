@@ -1,5 +1,7 @@
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { $, connect } from "bun";
+import { sendCommand } from "../server";
+import { EventNames } from "../server/handler";
 import type { ObjectEnum } from "../types";
 
 type Instance = {
@@ -13,9 +15,35 @@ type Instance = {
 const EventName = {
 	ActiveWindow: "activewindow",
 	ActiveWindowV2: "activewindowv2",
+	WindowTitle: "windowtitle",
+	WindowTitleV2: "windowtitlev2",
 } as const;
 
 type EventName = ObjectEnum<typeof EventName>;
+
+async function onTerminalActiveEvent(payload: string) {
+	const shell = $.cwd(payload);
+	const currentBranch = (
+		await shell`git rev-parse --abbrev-ref HEAD`.text()
+	).trim();
+
+	await sendCommand(EventNames.GitBranchChanged, {
+		directory: payload,
+		branch: currentBranch,
+	});
+}
+
+async function handleEvent(event: string) {
+	const [eventName, payload] = event.split(">>", 2) as [EventName, string];
+	switch (eventName) {
+		case EventName.ActiveWindow: {
+			const [application, title] = payload.split(",", 2);
+			if (application === "Alacritty") {
+				await onTerminalActiveEvent(title);
+			}
+		}
+	}
+}
 
 export async function connectToSocket() {
 	const instances: Instance[] = await $`hyprctl instances -j`.json();
@@ -45,10 +73,9 @@ export async function connectToSocket() {
 			data: (socket, data) => {
 				const payload = data.toString("utf8");
 				const events = payload.split("\n");
-				// const event = data.toString("utf8", 0, data.length);
-
-				console.log(payload);
-				// console.log(payload);
+				for (const event of events) {
+					handleEvent(event);
+				}
 			},
 			close: () => {
 				console.log("hyprland socket closed");

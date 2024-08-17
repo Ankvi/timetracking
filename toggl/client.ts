@@ -1,4 +1,4 @@
-import type { Client, User, Workspace } from "./types";
+import type { Client, CurrentTimeEntry, User, Workspace } from "./types";
 
 const BASE_URL = "https://api.track.toggl.com/api";
 const ME_URL = `${BASE_URL}/v9/me`;
@@ -26,13 +26,13 @@ export async function me(): Promise<User> {
 	return (await response.json()) as User;
 }
 
-export async function currentTimeEntry() {
+export async function currentTimeEntry(): Promise<CurrentTimeEntry> {
 	const response = await fetch(`${ME_URL}/time_entries/current`, {
 		headers,
 	});
 
 	const json = await response.json();
-	console.log(json);
+	return json as CurrentTimeEntry;
 }
 
 export async function workspaces(): Promise<Workspace[]> {
