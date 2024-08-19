@@ -2,7 +2,7 @@ import { handleEvent } from "./events";
 import { updatePanes } from "./panes";
 
 export async function listenToEvents() {
-	const proc = Bun.spawn(["tmux", "-C"], {
+	const proc = Bun.spawn(["tmux", "-C", "attach"], {
 		stdin: "pipe",
 	});
 
