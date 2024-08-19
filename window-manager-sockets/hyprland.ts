@@ -21,28 +21,17 @@ const EventName = {
 
 type EventName = ObjectEnum<typeof EventName>;
 
-async function onTerminalActiveEvent(payload: string) {
-	const shell = $.cwd(payload);
-	const currentBranch = (
-		await shell`git rev-parse --abbrev-ref HEAD`.text()
-	).trim();
-
-	await sendCommand(EventNames.GitBranchChanged, {
-		directory: payload,
-		branch: currentBranch,
-	});
-}
-
 async function handleEvent(event: string) {
-	const [eventName, payload] = event.split(">>", 2) as [EventName, string];
-	switch (eventName) {
-		case EventName.ActiveWindow: {
-			const [application, title] = payload.split(",", 2);
-			if (application === "Alacritty") {
-				await onTerminalActiveEvent(title);
-			}
-		}
-	}
+	// const [eventName, payload] = event.split(">>", 2) as [EventName, string];
+	// switch (eventName) {
+	// case EventName.ActiveWindow: {
+	// 	const [application, directory] = payload.split(",", 2);
+	// 	return await sendCommand(EventNames.ActiveWindowChanged, {
+	// 		application,
+	// 		directory,
+	// 	});
+	// }
+	// }
 }
 
 export async function connectToSocket() {
@@ -70,8 +59,8 @@ export async function connectToSocket() {
 			open: () => {
 				console.log("hyprland socket opened");
 			},
-			data: (socket, data) => {
-				const payload = data.toString("utf8");
+			data: (_, data) => {
+				const payload = data.toString("utf8").trim();
 				const events = payload.split("\n");
 				for (const event of events) {
 					handleEvent(event);
@@ -83,8 +72,6 @@ export async function connectToSocket() {
 		},
 		unix: socketPath,
 	});
-
-	console.log("Connected to hyprland socket");
 
 	process.on("SIGINT", () => socket.terminate());
 	process.on("SIGTERM", () => socket.terminate());

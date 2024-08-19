@@ -5,11 +5,12 @@ import * as server from "./server";
 import * as tmux from "./tmux";
 import * as togglClient from "./toggl/client";
 import * as windowManagers from "./window-manager-sockets";
+import type { WindowManager } from "./window-manager-sockets/types";
 
 const program = new Command("timetracking");
 
 type StartOptions = {
-	manager: "hyprland" | "sway";
+	manager: WindowManager;
 	terminal: string;
 	socketPath: string;
 };
@@ -17,9 +18,10 @@ type StartOptions = {
 program
 	.command("start")
 	.description("Start the timetracking process")
-	.requiredOption(
+	.option(
 		"-m, --manager <WINDOW_MANAGER>",
-		"Window manager to connect to",
+		"Window manager to connect to. Defaults to $XDG_CURRENT_DESKTOP",
+		process.env.XDG_CURRENT_DESKTOP,
 	)
 	.requiredOption(
 		"-t, --terminal <TERMINAL>",
@@ -31,8 +33,10 @@ program
 		server.DEFAULT_SERVER_SOCKET,
 	)
 	.action(async (args: StartOptions) => {
+		process.env.TERMINAL = args.terminal;
+
 		windowManagers.connect(args.manager);
-		tmux.connectToSocket();
+		tmux.start();
 		server.start({ socketPath: args.socketPath });
 	});
 

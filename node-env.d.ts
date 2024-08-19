@@ -3,6 +3,8 @@ declare namespace NodeJS {
 		XDG_RUNTIME_DIR: string;
 		TOGGL_API_TOKEN: string;
 		HOME: string;
+		TERMINAL: string;
+		UID: string;
 	}
 }
 

@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { name } from "../package.json";
 import { type EventNames, type EventPayloads, handler } from "./handler";
 
-const CACHE_FOLDER = `${Bun.env.HOME}/.cache/${name}`;
+const CACHE_FOLDER = `${process.env.HOME}/.cache/${name}`;
 export const DEFAULT_SERVER_SOCKET = `${CACHE_FOLDER}/server.sock`;
 
 type ServerResponse = {
@@ -22,10 +22,13 @@ export async function start({ socketPath }: ServerOpts) {
 	const server = Bun.serve({
 		unix: socketPath,
 		async fetch(req) {
-			const event = req.url.replace("http://localhost/", "") as EventNames;
+			const event = req.url.replace(
+				"http://localhost/",
+				"",
+			) as keyof EventPayloads;
 			const result = await handler(
 				event,
-				(await req.json()) as EventPayloads[EventNames],
+				(await req.json()) as EventPayloads[keyof EventPayloads],
 			);
 
 			return Response.json(result);
@@ -50,5 +53,8 @@ export async function sendCommand<T extends keyof EventPayloads>(
 	});
 
 	const message = (await response.json()) as ServerResponse;
-	console.log(message);
+	if (!message.success) {
+		console.warn("Command was unsuccessful:");
+		console.warn(message);
+	}
 }

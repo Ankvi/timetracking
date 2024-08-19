@@ -1,26 +1,24 @@
-import { connect } from "bun";
+import { handleEvent } from "./events";
+import { updatePanes } from "./panes";
 
-const SOCKET_PATH = "/tmp/tmux-1000/default";
-
-export async function connectToSocket() {
-	const socket = await connect({
-		unix: SOCKET_PATH,
-		socket: {
-			open: () => {
-				console.log("tmux socket opened");
-			},
-			data: (socket, data) => {
-				const payload = data.toString("utf8");
-				console.log(payload);
-			},
-			close: () => {
-				console.log("tmux socket closed");
-			},
-		},
+export async function listenToEvents() {
+	const proc = Bun.spawn(["tmux", "-C"], {
+		stdin: "pipe",
 	});
 
-	console.log("Connected to tmux socket");
+	process.on("SIGINT", () => proc.kill());
+	process.on("SIGTERM", () => proc.kill());
 
-	process.on("SIGINT", () => socket.terminate());
-	process.on("SIGTERM", () => socket.terminate());
+	const decoder = new TextDecoder();
+	for await (const line of proc.stdout.values()) {
+		const data = decoder.decode(line).trim();
+		handleEvent(data);
+	}
+
+	console.log("Closed tmux listener");
+}
+
+export async function start() {
+	await updatePanes();
+	listenToEvents();
 }

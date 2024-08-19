@@ -1,9 +1,14 @@
 import type { ObjectEnum } from "../types";
+import {
+	type ActiveWindowEvent,
+	activeWindowEventHandler,
+} from "./events/active-window-changed";
 
 export const EventNames = {
 	Shutdown: "shutdown",
 	StartTimeTracker: "start-time-tracker",
 	GitBranchChanged: "git-branch-changed",
+	ActiveWindowChanged: "active-window-changed",
 } as const;
 
 export type EventNames = ObjectEnum<typeof EventNames>;
@@ -13,10 +18,7 @@ export type EventPayloads = {
 	[EventNames.StartTimeTracker]: {
 		team: string;
 	};
-	[EventNames.GitBranchChanged]: {
-		directory: string;
-		branch: string;
-	};
+	[EventNames.ActiveWindowChanged]: ActiveWindowEvent;
 };
 
 type BaseResponse = {
@@ -28,20 +30,18 @@ export async function handler<T extends keyof EventPayloads>(
 	body: EventPayloads[T],
 ): Promise<BaseResponse> {
 	switch (event) {
-		case "shutdown": {
+		case EventNames.Shutdown: {
 			process.emit("SIGINT");
 			break;
 		}
 
-		case "start-time-tracker": {
-			return await Promise.resolve({
-				success: true,
-			});
+		case EventNames.StartTimeTracker: {
+			break;
 		}
 
-		case "git-branch-changed": {
-			console.log("Git branch changed");
-			console.log(body);
+		case EventNames.ActiveWindowChanged: {
+			await activeWindowEventHandler(body as ActiveWindowEvent);
+			break;
 		}
 	}
 

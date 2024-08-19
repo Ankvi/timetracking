@@ -1,10 +1,15 @@
-import { connectToSocket } from "./hyprland";
-import type { WindowManager } from "./types";
+import * as hyprland from "./hyprland";
+import * as sway from "./sway";
+import { WindowManager } from "./types";
 
 export async function connect(wm: WindowManager) {
 	switch (wm) {
-		case "hyprland":
-			return await connectToSocket();
+		case WindowManager.Hyprland:
+			return await hyprland.connectToSocket();
+
+		case WindowManager.Sway:
+			return await sway.connectToSocket();
+
 		default: {
 			throw new Error(`${wm} not implemented`);
 		}

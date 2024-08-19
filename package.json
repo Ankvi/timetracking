@@ -3,6 +3,10 @@
 	"module": "index.ts",
 	"bin": "index.ts",
 	"type": "module",
+	"scripts": {
+		"lint:ts": "bun --bun tsc --noEmit",
+		"lint": "bun --bun biome check"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
 		"bun-types": "^1.1.24"
