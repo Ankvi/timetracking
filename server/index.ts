@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { name } from "../package.json";
-import { type EventNames, type EventPayloads, handler } from "./handler";
+import { type EventPayloads, handler } from "./handler";
 
 const CACHE_FOLDER = `${process.env.HOME}/.cache/${name}`;
 export const DEFAULT_SERVER_SOCKET = `${CACHE_FOLDER}/server.sock`;

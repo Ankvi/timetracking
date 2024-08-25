@@ -1,3 +1,5 @@
+import type { Team } from "../types";
+
 export type Workspace = {
 	id: string;
 	organization_id: string;
@@ -10,6 +12,7 @@ export type User = {
 	fullname: string;
 	timezone: string;
 	default_workspace_id: string;
+	projects: Project[];
 };
 
 export type Client = {
@@ -67,4 +70,11 @@ export type CurrentTimeEntry = {
 	user_name: string;
 	wid: number;
 	workspace_id: number;
+};
+
+export type Project = {
+	id: number;
+	name: Team;
+	active: string;
+	client_id: Client["id"];
 };

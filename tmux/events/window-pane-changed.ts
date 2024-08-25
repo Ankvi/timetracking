@@ -1,7 +1,8 @@
 import { sendCommand } from "../../server";
 import { EventNames } from "../../server/handler";
-import { updatePaneDirectory } from "../panes";
+// import { getProjectFromTitle } from "../panes";
 import type { TmuxPaneId, TmuxWindowId } from "../types";
+import { getProjectFromTitle } from "../windows";
 
 export async function handle(payload: string) {
 	const [windowId, paneId] = payload.split(" ", 2) as [
@@ -9,14 +10,11 @@ export async function handle(payload: string) {
 		TmuxPaneId,
 	];
 
-	const directory = await updatePaneDirectory(paneId);
-
-	if (!directory) {
-		return;
-	}
+	const { directory, branch } = await getProjectFromTitle(windowId);
 
 	return await sendCommand(EventNames.ActiveWindowChanged, {
 		application: "tmux",
 		directory,
+		branch,
 	});
 }

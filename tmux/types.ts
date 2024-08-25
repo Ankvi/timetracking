@@ -1,4 +1,4 @@
-import type { ObjectEnum } from "../types";
+import type { Branch, Directory, ObjectEnum } from "../types";
 
 export const TmuxEventNames = {
 	WindowPaneChanged: "window-pane-changed",
@@ -10,3 +10,7 @@ export type TmuxEventName = `%${TmuxEventNames}`;
 
 export type TmuxWindowId = `@${string}`;
 export type TmuxPaneId = `%${string}`;
+
+export type TmuxTitlePrefix = "tmux";
+export type TmuxPaneTitle = `${TmuxTitlePrefix} | ${Directory} | ${Branch}`;
+export type TmuxPaneTitleParts = [TmuxTitlePrefix, Directory, Branch];

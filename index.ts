@@ -11,7 +11,7 @@ const program = new Command("timetracking");
 
 type StartOptions = {
 	manager: WindowManager;
-	terminal: string;
+	// terminal: string;
 	socketPath: string;
 };
 
@@ -23,20 +23,20 @@ program
 		"Window manager to connect to. Defaults to $XDG_CURRENT_DESKTOP",
 		process.env.XDG_CURRENT_DESKTOP,
 	)
-	.requiredOption(
-		"-t, --terminal <TERMINAL>",
-		"The WM_CLASS of your used terminal, e.g. Alacritty",
-	)
+	// .requiredOption(
+	// 	"-t, --terminal <TERMINAL>",
+	// 	"The WM_CLASS of your used terminal, e.g. Alacritty",
+	// )
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
 		"Optional socket path to use instead of the default one",
 		server.DEFAULT_SERVER_SOCKET,
 	)
 	.action(async (args: StartOptions) => {
-		process.env.TERMINAL = args.terminal;
+		// process.env.TERMINAL = args.terminal;
 
 		windowManagers.connect(args.manager);
-		tmux.start();
+		// tmux.start();
 		server.start({ socketPath: args.socketPath });
 	});
 

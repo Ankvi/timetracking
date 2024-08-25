@@ -12,18 +12,18 @@ const headers = {
 	Authorization: `Basic ${credentials}`,
 };
 
-let currentUser: User;
+let currentUser: Promise<User>;
 
 export async function me(): Promise<User> {
 	if (currentUser) {
 		return currentUser;
 	}
 
-	const response = await fetch(ME_URL, {
+	currentUser = fetch(ME_URL, {
 		headers,
-	});
+	}).then((response) => response.json()) as Promise<User>;
 
-	return (await response.json()) as User;
+	return await currentUser;
 }
 
 export async function currentTimeEntry(): Promise<CurrentTimeEntry> {

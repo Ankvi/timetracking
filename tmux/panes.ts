@@ -1,14 +1,25 @@
 import { $ } from "bun";
-import type { TmuxPaneId } from "./types";
+import type { Directory, Project } from "../types";
+import { getProject } from "./titles";
+import type { TmuxPaneId, TmuxPaneTitle } from "./types";
 
-const tmuxPanes = new Map<TmuxPaneId, string>();
+const tmuxPanes = new Map<TmuxPaneId, Directory>();
 
-export async function updatePaneDirectory(paneId: TmuxPaneId) {
-	const directory = await getPaneDirectory(paneId, true);
+export async function updatePaneDirectory(
+	paneId: TmuxPaneId,
+	newDirectory?: Directory,
+) {
+	let directory = newDirectory;
+	if (!newDirectory) {
+		const project = await getProjectFromTitle(paneId);
+		directory = project.directory;
+	}
+
 	if (!directory) {
 		console.warn(`Could not get directory for pane: ${paneId}`);
 		return;
 	}
+
 	tmuxPanes.set(paneId, directory);
 	return directory;
 }
@@ -31,13 +42,26 @@ export async function updatePanes() {
 	}
 }
 
+export async function getProjectFromTitle(
+	paneId: TmuxPaneId,
+): Promise<Project> {
+	console.debug(`Getting title of tmux pane: ${paneId}`);
+	const title = (
+		await $`tmux display -pt ${paneId} "#{pane_title}"`.text()
+	).trimEnd() as TmuxPaneTitle;
+
+	console.debug(`Tmux title: ${title}`);
+
+	return getProject(title);
+}
+
 export async function getPaneDirectory<TForce extends boolean>(
 	paneId: TmuxPaneId,
 	force?: TForce,
 ): Promise<string | undefined> {
 	if (force) {
 		const directory = (
-			await $`tmux display -pt ${paneId} "#{pane_current_path}`.text()
+			await $`tmux display -pt ${paneId} "#{pane_current_path}"`.text()
 		).trimEnd();
 		return directory;
 	}
