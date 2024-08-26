@@ -11,7 +11,7 @@ export type User = {
 	email: string;
 	fullname: string;
 	timezone: string;
-	default_workspace_id: string;
+	default_workspace_id: number;
 	projects: Project[];
 };
 
@@ -27,12 +27,12 @@ export type TimeEntryRequest = {
 	duration: number;
 	// pid: number;
 	project_id?: number;
-	shared_with_user_ids: number[];
+	shared_with_user_ids?: number[];
 	start: Date;
 	// start_date: string;
 	stop?: string;
 	tag_action?: "add" | "delete";
-	tag_ids: number[];
+	tag_ids?: number[];
 	tags?: string[];
 	task_id?: number;
 	// tid: number;

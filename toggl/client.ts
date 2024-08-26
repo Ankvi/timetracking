@@ -1,4 +1,10 @@
-import type { Client, CurrentTimeEntry, User, Workspace } from "./types";
+import type {
+	Client,
+	CurrentTimeEntry,
+	TimeEntryRequest,
+	User,
+	Workspace,
+} from "./types";
 
 const BASE_URL = "https://api.track.toggl.com/api";
 const ME_URL = `${BASE_URL}/v9/me`;
@@ -26,13 +32,50 @@ export async function me(): Promise<User> {
 	return await currentUser;
 }
 
-export async function currentTimeEntry(): Promise<CurrentTimeEntry> {
-	const response = await fetch(`${ME_URL}/time_entries/current`, {
-		headers,
-	});
+export async function getCurrentTimeEntry(): Promise<CurrentTimeEntry | null> {
+	try {
+		const response = await fetch(`${ME_URL}/time_entries/current`, {
+			headers,
+		});
 
-	const json = await response.json();
-	return json as CurrentTimeEntry;
+		const json = await response.json();
+		return json as CurrentTimeEntry;
+	} catch (error) {
+		console.warn(error);
+		return null;
+	}
+}
+
+export async function startTimeEntry(
+	description: string,
+	workspace_id?: number,
+): Promise<CurrentTimeEntry | null> {
+	try {
+		const timeEntry: TimeEntryRequest = {
+			workspace_id: workspace_id ?? (await me()).default_workspace_id,
+			description,
+			created_with: "timetracking",
+			duration: -1,
+			start: new Date(),
+		};
+
+		const startedEntry = await fetch(
+			`${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries`,
+			{
+				method: "POST",
+				headers: {
+					...headers,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(timeEntry),
+			},
+		);
+
+		return (await startedEntry.json()) as CurrentTimeEntry;
+	} catch (error) {
+		console.warn(error);
+		return null;
+	}
 }
 
 export async function workspaces(): Promise<Workspace[]> {

@@ -1,3 +1,4 @@
+import { $ } from "bun";
 import type { ObjectEnum } from "../types";
 import {
 	type ActiveWindowEvent,
@@ -28,22 +29,28 @@ type BaseResponse = {
 export async function handler<T extends keyof EventPayloads>(
 	event: T,
 	body: EventPayloads[T],
-): Promise<BaseResponse> {
-	switch (event) {
-		case EventNames.Shutdown: {
-			process.emit("SIGINT");
-			break;
+): Promise<void> {
+	try {
+		switch (event) {
+			case EventNames.Shutdown: {
+				process.emit("SIGINT");
+				break;
+			}
+
+			case EventNames.StartTimeTracker: {
+				break;
+			}
+
+			case EventNames.ActiveWindowChanged: {
+				await activeWindowEventHandler(body as ActiveWindowEvent);
+				break;
+			}
 		}
 
-		case EventNames.StartTimeTracker: {
-			break;
-		}
-
-		case EventNames.ActiveWindowChanged: {
-			await activeWindowEventHandler(body as ActiveWindowEvent);
-			break;
+		// return { success: true };
+	} catch (error) {
+		if (error instanceof Error) {
+			await $`notify-send "Timetracking error" "${error.message}"`;
 		}
 	}
-
-	return { success: true };
 }

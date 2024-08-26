@@ -58,7 +58,7 @@ toggl
 toggl
 	.command("current-entry")
 	.description("Print the current running time entry")
-	.action(() => togglClient.currentTimeEntry().then(console.log));
+	.action(() => togglClient.getCurrentTimeEntry().then(console.log));
 toggl
 	.command("workspaces")
 	.description("Print all workspaces available to the current account")
