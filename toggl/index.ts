@@ -1,5 +1,5 @@
 import type { Team } from "../types";
-import { getCurrentTimeEntry, me } from "./client";
+import { getCurrentTimeEntry, me, startTimeEntry } from "./client";
 
 export async function startTimer(
 	team: Team,
@@ -18,6 +18,9 @@ export async function startTimer(
 
 	const currentTimeEntry = await getCurrentTimeEntry();
 
+	const taskName = `${team}-${ticketNumber}: name`;
+
 	if (!currentTimeEntry) {
+		return await startTimeEntry(taskName, user.default_workspace_id);
 	}
 }
