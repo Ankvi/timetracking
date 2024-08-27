@@ -47,11 +47,21 @@ export async function sendCommand<T extends keyof EventPayloads>(
 	data: EventPayloads[T],
 	opts?: ServerOpts,
 ) {
-	const response = await fetch(`http://localhost/${event}`, {
-		unix: opts?.socketPath ?? DEFAULT_SERVER_SOCKET,
-		method: "POST",
-		body: data ? JSON.stringify(data) : undefined,
-	});
+	try {
+		const response = await fetch(`http://localhost/${event}`, {
+			unix: opts?.socketPath ?? DEFAULT_SERVER_SOCKET,
+			method: "POST",
+			body: data ? JSON.stringify(data) : undefined,
+		});
+	} catch (error) {
+		if (error instanceof Error) {
+			if (error.name === "FailedToOpenSocket") {
+				logger.info("Timetracking server is currently not running");
+				return;
+			}
+			logger.error(error);
+		}
+	}
 	//
 	// const message = (await response.json()) as ServerResponse;
 	// if (!message.success) {
