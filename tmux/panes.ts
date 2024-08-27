@@ -1,4 +1,5 @@
 import { $ } from "bun";
+import { logger } from "../logging";
 import type { Directory, Project } from "../types";
 import { getProject } from "./titles";
 import type { TmuxPaneId, TmuxPaneTitle } from "./types";
@@ -16,7 +17,7 @@ export async function updatePaneDirectory(
 	}
 
 	if (!directory) {
-		console.warn(`Could not get directory for pane: ${paneId}`);
+		logger.warn(`Could not get directory for pane: ${paneId}`);
 		return;
 	}
 
@@ -45,12 +46,12 @@ export async function updatePanes() {
 export async function getProjectFromTitle(
 	paneId: TmuxPaneId,
 ): Promise<Project> {
-	console.debug(`Getting title of tmux pane: ${paneId}`);
+	logger.debug(`Getting title of tmux pane: ${paneId}`);
 	const title = (
 		await $`tmux display -pt ${paneId} "#{pane_title}"`.text()
 	).trimEnd() as TmuxPaneTitle;
 
-	console.debug(`Tmux title: ${title}`);
+	logger.debug(`Tmux title: ${title}`);
 
 	return getProject(title);
 }

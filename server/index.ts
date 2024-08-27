@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
+import { logger } from "../logging";
 import { name } from "../package.json";
 import { type EventPayloads, handler } from "./handler";
 
@@ -35,7 +36,7 @@ export async function start({ socketPath }: ServerOpts) {
 		},
 	});
 
-	console.log("Socket opened at path", socketPath);
+	logger.info("Socket opened at path", socketPath);
 
 	process.on("SIGINT", () => server.stop());
 	process.on("SIGTERM", () => server.stop());
@@ -54,7 +55,7 @@ export async function sendCommand<T extends keyof EventPayloads>(
 	//
 	// const message = (await response.json()) as ServerResponse;
 	// if (!message.success) {
-	// 	console.warn("Command was unsuccessful:");
-	// 	console.warn(message);
+	// 	logger.warn("Command was unsuccessful:");
+	// 	logger.warn(message);
 	// }
 }

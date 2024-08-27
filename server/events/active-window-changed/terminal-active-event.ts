@@ -1,3 +1,4 @@
+import { logger } from "../../../logging";
 import { getProject } from "../../../tmux/titles";
 import type { TmuxPaneTitle } from "../../../tmux/types";
 import { startTimer } from "../../../toggl";
@@ -17,7 +18,7 @@ const branchTester = /^([a-z]+)\/([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
 function extractBranchInfo(branch: Branch): BranchInfo | null {
 	const result = branchTester.exec(branch);
 	if (!result) {
-		console.debug(
+		logger.debug(
 			"Branch did not match requirements for a toggl timer. Private project?",
 		);
 		return null;
@@ -36,18 +37,18 @@ function extractBranchInfo(branch: Branch): BranchInfo | null {
 let currentBranch: Branch | null;
 
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
-	console.debug("Got terminal active event");
+	logger.debug("Got terminal active event");
 	const { directory, branch } = getProject(title);
-	console.log(
+	logger.info(
 		`Got active window in directory: ${directory} and branch: ${branch}`,
 	);
 	if (!branch) {
-		console.debug("Event did not contain a branch.");
+		logger.debug("Event did not contain a branch.");
 		return;
 	}
 
 	if (branch === currentBranch) {
-		console.debug("Same branch as current. Skipping");
+		logger.debug("Same branch as current. Skipping");
 	}
 
 	const branchInfo = extractBranchInfo(branch);
@@ -55,7 +56,7 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 		return;
 	}
 
-	console.debug(branchInfo);
+	logger.debug(branchInfo);
 	const { team, ticketNumber, name } = branchInfo;
 	await startTimer(team, ticketNumber, name);
 }

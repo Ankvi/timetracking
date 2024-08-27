@@ -1,3 +1,4 @@
+import { logger } from "../logging";
 import type {
 	Client,
 	CurrentTimeEntry,
@@ -43,7 +44,7 @@ export async function getCurrentTimeEntry(): Promise<
 		const json = await response.json();
 		return json as CurrentTimeEntry;
 	} catch (error) {
-		console.warn(error);
+		logger.warn(error);
 		return;
 	}
 }
@@ -66,7 +67,7 @@ export async function startTimeEntry(
 		}
 
 		const url = `${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries`;
-		console.debug(`Starting time entry at url ${url}`);
+		logger.debug(`Starting time entry at url ${url}`);
 
 		const response = await fetch(url, {
 			method: "POST",
@@ -78,7 +79,7 @@ export async function startTimeEntry(
 		});
 
 		if (!response.ok) {
-			console.warn(
+			logger.warn(
 				`Start time entry request was not successful: ${response.status} - ${await response.text()}`,
 			);
 			return;
@@ -86,7 +87,7 @@ export async function startTimeEntry(
 
 		return (await response.json()) as CurrentTimeEntry;
 	} catch (error) {
-		console.warn(error);
+		logger.warn(error);
 		return;
 	}
 }

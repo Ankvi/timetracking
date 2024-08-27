@@ -1,3 +1,4 @@
+import { logger } from "../logging";
 import { handleEvent } from "./events";
 import { updatePanes } from "./panes";
 
@@ -15,7 +16,7 @@ export async function listenToEvents() {
 		handleEvent(data);
 	}
 
-	console.log("Closed tmux listener");
+	logger.info("Closed tmux listener");
 }
 
 export async function start() {

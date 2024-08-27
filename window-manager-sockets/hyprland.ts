@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { $, connect } from "bun";
+import { logger } from "../logging";
 import type { ObjectEnum } from "../types";
 import { handle as activeWindow } from "./events/active-window";
 
@@ -29,7 +30,7 @@ async function handleEvent(event: string) {
 		}
 
 		default: {
-			// console.debug(
+			// logger.debug(
 			// 	`Got hyprland event "${eventName}" with payload:\n${payload}`,
 			// );
 		}
@@ -59,7 +60,7 @@ export async function connectToSocket() {
 	const socket = await connect({
 		socket: {
 			open: () => {
-				console.log("hyprland socket opened");
+				logger.info("hyprland socket opened");
 			},
 			data: (_, data) => {
 				const payload = data.toString("utf8").trim();
@@ -69,7 +70,7 @@ export async function connectToSocket() {
 				}
 			},
 			close: () => {
-				console.log("hyprland socket closed");
+				logger.info("hyprland socket closed");
 			},
 		},
 		unix: socketPath,

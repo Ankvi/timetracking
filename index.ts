@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
+import { initializeLogger } from "./logging";
 import * as server from "./server";
 import * as tmux from "./tmux";
 import * as toggl from "./toggl";
@@ -8,6 +9,12 @@ import * as windowManagers from "./window-manager-sockets";
 import type { WindowManager } from "./window-manager-sockets/types";
 
 const program = new Command("timetracking");
+
+type BaseOptions = {
+	verbose?: boolean;
+};
+
+program.option("-v, --verbose");
 
 type StartOptions = {
 	manager: WindowManager;
@@ -60,5 +67,10 @@ program
 	.action(server.sendCommand);
 
 program.addCommand(toggl.command);
+
+program.hook("preAction", (command) => {
+	const options = command.optsWithGlobals<BaseOptions>();
+	initializeLogger(options.verbose);
+});
 
 await program.parseAsync();
