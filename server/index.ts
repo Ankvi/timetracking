@@ -51,10 +51,10 @@ export async function sendCommand<T extends keyof EventPayloads>(
 		method: "POST",
 		body: JSON.stringify(data),
 	});
-
-	const message = (await response.json()) as ServerResponse;
-	if (!message.success) {
-		console.warn("Command was unsuccessful:");
-		console.warn(message);
-	}
+	//
+	// const message = (await response.json()) as ServerResponse;
+	// if (!message.success) {
+	// 	console.warn("Command was unsuccessful:");
+	// 	console.warn(message);
+	// }
 }

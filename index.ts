@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import * as server from "./server";
 import * as tmux from "./tmux";
-import * as togglClient from "./toggl/client";
+import * as toggl from "./toggl";
 import * as windowManagers from "./window-manager-sockets";
 import type { WindowManager } from "./window-manager-sockets/types";
 
@@ -36,6 +36,7 @@ program
 		// process.env.TERMINAL = args.terminal;
 
 		windowManagers.connect(args.manager);
+		toggl.initialize();
 		// tmux.start();
 		server.start({ socketPath: args.socketPath });
 	});
@@ -50,18 +51,6 @@ program
 	)
 	.action(server.sendCommand);
 
-const toggl = program.command("toggl").description("Toggl track commands");
-toggl
-	.command("whoami")
-	.description("Print the currently active toggl track user")
-	.action(() => togglClient.me().then(console.log));
-toggl
-	.command("current-entry")
-	.description("Print the current running time entry")
-	.action(() => togglClient.getCurrentTimeEntry().then(console.log));
-toggl
-	.command("workspaces")
-	.description("Print all workspaces available to the current account")
-	.action(() => togglClient.workspaces().then(console.log));
+program.addCommand(toggl.command);
 
 await program.parseAsync();

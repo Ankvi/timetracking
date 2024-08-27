@@ -1,5 +1,6 @@
 import { getProject } from "../../../tmux/titles";
 import type { TmuxPaneTitle } from "../../../tmux/types";
+import { startTimer } from "../../../toggl";
 import type { Branch, BranchType, Team } from "../../../types";
 
 type BranchInfo = {
@@ -53,5 +54,7 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 		return;
 	}
 
+	const { team, ticketNumber, name } = branchInfo;
 	console.debug(branchInfo);
+	await startTimer(team, ticketNumber, name);
 }

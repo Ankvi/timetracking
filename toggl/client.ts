@@ -8,7 +8,7 @@ import type {
 
 const BASE_URL = "https://api.track.toggl.com/api";
 const ME_URL = `${BASE_URL}/v9/me`;
-const WORKSPACES_URL = `${BASE_URL}/workspaces`;
+const WORKSPACES_URL = `${BASE_URL}/v9/workspaces`;
 
 const credentials = Buffer.from(
 	`${Bun.env.TOGGL_API_TOKEN}:api_token`,
@@ -25,7 +25,7 @@ export async function me(): Promise<User> {
 		return currentUser;
 	}
 
-	currentUser = fetch(ME_URL, {
+	currentUser = fetch(`${ME_URL}?with_related_data=true`, {
 		headers,
 	}).then((response) => response.json()) as Promise<User>;
 
@@ -61,23 +61,44 @@ export async function startTimeEntry(
 			start: new Date(),
 		};
 
-		const startedEntry = await fetch(
-			`${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries`,
-			{
-				method: "POST",
-				headers: {
-					...headers,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(timeEntry),
-			},
-		);
+		if (!timeEntry.workspace_id) {
+			throw new Error("Cannot start time entry without a workspace");
+		}
 
-		return (await startedEntry.json()) as CurrentTimeEntry;
+		const url = `${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries`;
+		console.debug(`Starting time entry at url ${url}`);
+
+		const response = await fetch(url, {
+			method: "POST",
+			headers: {
+				...headers,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(timeEntry),
+		});
+
+		if (!response.ok) {
+			console.warn(
+				`Start time entry request was not successful: ${response.status} - ${await response.text()}`,
+			);
+			return;
+		}
+
+		return (await response.json()) as CurrentTimeEntry;
 	} catch (error) {
 		console.warn(error);
 		return;
 	}
+}
+
+export async function stopTimeEntry(timeEntry: CurrentTimeEntry) {
+	await fetch(
+		`${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries/${timeEntry.id}/stop`,
+		{
+			method: "PATCH",
+			headers,
+		},
+	);
 }
 
 export async function workspaces(): Promise<Workspace[]> {
