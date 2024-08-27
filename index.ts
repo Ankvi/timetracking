@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import { initializeLogger } from "./logging";
+import { logger } from "./logging";
 import * as server from "./server";
 import * as tmux from "./tmux";
 import * as toggl from "./toggl";
@@ -70,7 +70,9 @@ program.addCommand(toggl.command);
 
 program.hook("preAction", (command) => {
 	const options = command.optsWithGlobals<BaseOptions>();
-	initializeLogger(options.verbose);
+	if (options.verbose) {
+		logger.level = "debug";
+	}
 });
 
 await program.parseAsync();
