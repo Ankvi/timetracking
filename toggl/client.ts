@@ -32,7 +32,9 @@ export async function me(): Promise<User> {
 	return await currentUser;
 }
 
-export async function getCurrentTimeEntry(): Promise<CurrentTimeEntry | null> {
+export async function getCurrentTimeEntry(): Promise<
+	CurrentTimeEntry | undefined
+> {
 	try {
 		const response = await fetch(`${ME_URL}/time_entries/current`, {
 			headers,
@@ -42,14 +44,14 @@ export async function getCurrentTimeEntry(): Promise<CurrentTimeEntry | null> {
 		return json as CurrentTimeEntry;
 	} catch (error) {
 		console.warn(error);
-		return null;
+		return;
 	}
 }
 
 export async function startTimeEntry(
 	description: string,
 	workspace_id?: number,
-): Promise<CurrentTimeEntry | null> {
+): Promise<CurrentTimeEntry | undefined> {
 	try {
 		const timeEntry: TimeEntryRequest = {
 			workspace_id: workspace_id ?? (await me()).default_workspace_id,
@@ -74,7 +76,7 @@ export async function startTimeEntry(
 		return (await startedEntry.json()) as CurrentTimeEntry;
 	} catch (error) {
 		console.warn(error);
-		return null;
+		return;
 	}
 }
 
