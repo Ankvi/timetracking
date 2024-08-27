@@ -41,6 +41,14 @@ program
 		server.start({ socketPath: args.socketPath });
 	});
 
+program.command("resume").action(async () => {
+	await server.sendCommand("resume", undefined);
+});
+
+program.command("pause").action(async () => {
+	await server.sendCommand("pause", undefined);
+});
+
 program
 	.command("send")
 	.argument("<data>")

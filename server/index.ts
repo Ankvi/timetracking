@@ -26,10 +26,10 @@ export async function start({ socketPath }: ServerOpts) {
 				"http://localhost/",
 				"",
 			) as keyof EventPayloads;
-			const result = await handler(
-				event,
-				(await req.json()) as EventPayloads[keyof EventPayloads],
-			);
+			const body = req.body
+				? ((await req.json()) as EventPayloads[keyof EventPayloads])
+				: undefined;
+			const result = await handler(event, body);
 
 			return Response.json(result);
 		},
@@ -49,7 +49,7 @@ export async function sendCommand<T extends keyof EventPayloads>(
 	const response = await fetch(`http://localhost/${event}`, {
 		unix: opts?.socketPath ?? DEFAULT_SERVER_SOCKET,
 		method: "POST",
-		body: JSON.stringify(data),
+		body: data ? JSON.stringify(data) : undefined,
 	});
 	//
 	// const message = (await response.json()) as ServerResponse;

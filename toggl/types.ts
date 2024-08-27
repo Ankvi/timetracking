@@ -59,7 +59,7 @@ export type CurrentTimeEntry = {
 	project_name: string;
 	shared_with_user_ids: [number];
 	start: string;
-	stop: string;
+	stop?: string;
 	tag_ids: [number];
 	tags: [string];
 	task_id?: number;

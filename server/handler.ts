@@ -1,4 +1,5 @@
 import { $ } from "bun";
+import { resumeTimer, stopTimer } from "../toggl";
 import type { ObjectEnum } from "../types";
 import {
 	type ActiveWindowEvent,
@@ -7,6 +8,8 @@ import {
 
 export const EventNames = {
 	Shutdown: "shutdown",
+	Pause: "pause",
+	Resume: "resume",
 	StartTimeTracker: "start-time-tracker",
 	GitBranchChanged: "git-branch-changed",
 	ActiveWindowChanged: "active-window-changed",
@@ -16,6 +19,8 @@ export type EventNames = ObjectEnum<typeof EventNames>;
 
 export type EventPayloads = {
 	[EventNames.Shutdown]: never;
+	[EventNames.Pause]: undefined;
+	[EventNames.Resume]: undefined;
 	[EventNames.StartTimeTracker]: {
 		team: string;
 	};
@@ -37,7 +42,13 @@ export async function handler<T extends keyof EventPayloads>(
 				break;
 			}
 
-			case EventNames.StartTimeTracker: {
+			case EventNames.Resume: {
+				await resumeTimer();
+				break;
+			}
+
+			case EventNames.Pause: {
+				await stopTimer();
 				break;
 			}
 

@@ -36,6 +36,7 @@ function extractBranchInfo(branch: Branch): BranchInfo | null {
 let currentBranch: Branch | null;
 
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
+	console.debug("Got terminal active event");
 	const { directory, branch } = getProject(title);
 	console.log(
 		`Got active window in directory: ${directory} and branch: ${branch}`,
@@ -54,7 +55,7 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 		return;
 	}
 
-	const { team, ticketNumber, name } = branchInfo;
 	console.debug(branchInfo);
+	const { team, ticketNumber, name } = branchInfo;
 	await startTimer(team, ticketNumber, name);
 }

@@ -92,13 +92,15 @@ export async function startTimeEntry(
 }
 
 export async function stopTimeEntry(timeEntry: CurrentTimeEntry) {
-	await fetch(
+	const response = await fetch(
 		`${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries/${timeEntry.id}/stop`,
 		{
 			method: "PATCH",
 			headers,
 		},
 	);
+
+	return (await response.json()) as CurrentTimeEntry;
 }
 
 export async function workspaces(): Promise<Workspace[]> {

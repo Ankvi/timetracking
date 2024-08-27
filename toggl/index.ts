@@ -42,15 +42,31 @@ export async function startTimer(
 	}
 }
 
-async function stopTimer() {
+export async function resumeTimer() {
+	if (!currentTimeEntry) {
+		console.debug("No timer to resume");
+		return;
+	}
+
+	currentTimeEntry = await client.startTimeEntry(
+		currentTimeEntry.description,
+		currentTimeEntry.workspace_id,
+	);
+}
+
+export async function stopTimer() {
 	if (!currentTimeEntry) {
 		console.debug("No timers to stop");
 		return;
 	}
 
+	if (currentTimeEntry.stop) {
+		console.debug("Timer already stopped");
+		return;
+	}
+
 	console.debug("Stopping active toggl timer");
-	await client.stopTimeEntry(currentTimeEntry);
-	currentTimeEntry = undefined;
+	currentTimeEntry = await client.stopTimeEntry(currentTimeEntry);
 }
 
 export function initialize() {
