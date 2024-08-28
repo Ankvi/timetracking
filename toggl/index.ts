@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import type { Team } from "../types";
+import type { BranchType, Team } from "../types";
 import type { CurrentTimeEntry } from "./types";
 
 import { logger } from "../logging";
@@ -8,6 +8,7 @@ import * as client from "./client";
 let currentTimeEntry: CurrentTimeEntry | undefined;
 
 export async function startTimer(
+	type: BranchType,
 	team: Team,
 	ticketNumber: number,
 	name: string,
@@ -27,20 +28,18 @@ export async function startTimer(
 		currentTimeEntry = currentEntryResponse;
 	}
 
-	const taskName = `${team}-${ticketNumber}: ${name}`;
+	const taskName = `${type}(${team}-${ticketNumber}): ${name}`;
 
-	if (currentTimeEntry?.description === taskName) {
+	if (currentTimeEntry?.description === taskName && !currentTimeEntry.stop) {
 		logger.info("Time entry for task already running");
 		return;
 	}
 
-	if (!currentTimeEntry) {
-		logger.info(`Starting time entry with description: ${taskName}`);
-		currentTimeEntry = await client.startTimeEntry(
-			taskName,
-			user.default_workspace_id,
-		);
-	}
+	logger.info(`Starting time entry with description: ${taskName}`);
+	currentTimeEntry = await client.startTimeEntry(
+		taskName,
+		user.default_workspace_id,
+	);
 }
 
 export async function resumeTimer() {
