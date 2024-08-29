@@ -19,7 +19,11 @@
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
 		"noImplicitReturns": true,
-		"types": ["bun-types", "node"]
+		"types": ["bun-types", "node"],
+		"paths": {
+			"@/server": ["./server/index.ts"],
+			"@/server/*": ["./server/*"]
+		}
 	},
 	"exclude": ["node_modules"]
 }
