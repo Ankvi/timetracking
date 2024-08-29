@@ -39,7 +39,7 @@ let currentBranch: Branch | null;
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 	logger.debug("Got terminal active event");
 	const { directory, branch } = getProject(title);
-	logger.info(
+	logger.debug(
 		`Got active window in directory: ${directory} and branch: ${branch}`,
 	);
 	if (!branch) {

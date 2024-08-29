@@ -51,11 +51,13 @@ export async function getCurrentTimeEntry(): Promise<
 
 export async function startTimeEntry(
 	description: string,
-	workspace_id?: number,
+	projectId: number,
+	workspaceId?: number,
 ): Promise<CurrentTimeEntry | undefined> {
 	try {
 		const timeEntry: TimeEntryRequest = {
-			workspace_id: workspace_id ?? (await me()).default_workspace_id,
+			workspace_id: workspaceId ?? (await me()).default_workspace_id,
+			project_id: projectId,
 			description,
 			created_with: "timetracking",
 			duration: -1,

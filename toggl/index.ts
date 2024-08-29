@@ -15,9 +15,9 @@ export async function startTimer(
 ) {
 	const user = await client.me();
 
-	const teamId = user.projects.find((project) => project.name === team);
+	const project = user.projects.find((project) => project.name === team);
 
-	if (!teamId) {
+	if (!project) {
 		throw new Error(
 			`The team '${team}' does not have a corresponding team ID in toggl`,
 		);
@@ -38,6 +38,7 @@ export async function startTimer(
 	logger.info(`Starting time entry with description: ${taskName}`);
 	currentTimeEntry = await client.startTimeEntry(
 		taskName,
+		project.id,
 		user.default_workspace_id,
 	);
 }
