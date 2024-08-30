@@ -51,7 +51,7 @@ export async function getCurrentTimeEntry(): Promise<
 
 export async function startTimeEntry(
 	description: string,
-	projectId: number,
+	projectId?: number,
 	workspaceId?: number,
 ): Promise<CurrentTimeEntry | undefined> {
 	try {

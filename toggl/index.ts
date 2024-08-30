@@ -24,8 +24,7 @@ export async function startTimer(
 	}
 
 	if (!currentTimeEntry) {
-		const currentEntryResponse = await client.getCurrentTimeEntry();
-		currentTimeEntry = currentEntryResponse;
+		currentTimeEntry = await client.getCurrentTimeEntry();
 	}
 
 	const taskName = `${type}(${team}-${ticketNumber}): ${name}`;
@@ -49,8 +48,14 @@ export async function resumeTimer() {
 		return;
 	}
 
+	if (!currentTimeEntry.stop) {
+		logger.debug("Timer is already running for the current entry");
+		return;
+	}
+
 	currentTimeEntry = await client.startTimeEntry(
 		currentTimeEntry.description,
+		currentTimeEntry.project_id,
 		currentTimeEntry.workspace_id,
 	);
 }
