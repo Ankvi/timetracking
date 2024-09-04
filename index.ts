@@ -57,8 +57,7 @@ program.command("pause").action(async () => {
 });
 
 program
-	.command("send")
-	.argument("<data>")
+	.command("send <event> <payload>")
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
 		"Optional socket path to use instead of the default one",
