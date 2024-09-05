@@ -1,6 +1,7 @@
 import { sendCommand } from "@/server";
 import { $, connect } from "bun";
 import { logger } from "../../logging";
+import type { WMSocket } from "../types";
 import {
 	Command,
 	type CommandPayloads,
@@ -100,7 +101,7 @@ async function processIpcMessages(buffer: Buffer) {
 	}
 }
 
-export async function connectToSocket() {
+export async function connectToSocket(): Promise<WMSocket> {
 	const socketPath = await $`sway --get-socketpath`.text();
 
 	const socket = await connect({
@@ -113,10 +114,12 @@ export async function connectToSocket() {
 			data: (_, data) => {
 				processIpcMessages(data);
 			},
+			close: () => {
+				logger.info("swaywm socket closed");
+			},
 		},
 		unix: socketPath.trim(),
 	});
 
-	process.on("SIGINT", () => socket.terminate());
-	process.on("SIGTERM", () => socket.terminate());
+	return socket;
 }

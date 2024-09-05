@@ -2,6 +2,7 @@ import { Command } from "commander";
 import type { BranchType, Team } from "../types";
 import type { CurrentTimeEntry } from "./types";
 
+import { getTicket } from "../jira";
 import { logger } from "../logging";
 import * as client from "./client";
 
@@ -27,7 +28,8 @@ export async function startTimer(
 		currentTimeEntry = await client.getCurrentTimeEntry();
 	}
 
-	const taskName = `${type}(${team}-${ticketNumber}): ${name}`;
+	const ticketInfo = await getTicket(team, ticketNumber);
+	const taskName = `${type}(${ticketInfo.key}): ${ticketInfo.fields.summary}`;
 
 	if (currentTimeEntry?.description === taskName && !currentTimeEntry.stop) {
 		logger.info("Time entry for task already running");

@@ -1,8 +1,8 @@
 import * as hyprland from "./hyprland";
 import * as sway from "./sway";
-import { WindowManager } from "./types";
+import { type WMSocket, WindowManager } from "./types";
 
-export async function connect(wm: WindowManager) {
+export async function connect(wm: WindowManager): Promise<WMSocket> {
 	switch (wm) {
 		case WindowManager.Hyprland:
 			return await hyprland.connectToSocket();

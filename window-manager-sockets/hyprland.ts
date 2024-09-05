@@ -3,6 +3,7 @@ import { $, connect } from "bun";
 import { logger } from "../logging";
 import type { ObjectEnum } from "../types";
 import { handle as activeWindow } from "./events/active-window";
+import type { WMSocket } from "./types";
 
 type Instance = {
 	instance: string;
@@ -37,7 +38,7 @@ async function handleEvent(event: string) {
 	}
 }
 
-export async function connectToSocket() {
+export async function connectToSocket(): Promise<WMSocket> {
 	const instances: Instance[] = await $`hyprctl instances -j`.json();
 
 	if (!instances.length) {
@@ -76,6 +77,5 @@ export async function connectToSocket() {
 		unix: socketPath,
 	});
 
-	process.on("SIGINT", () => socket.terminate());
-	process.on("SIGTERM", () => socket.terminate());
+	return socket;
 }

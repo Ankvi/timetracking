@@ -5,7 +5,6 @@
 	"type": "module",
 	"scripts": {
 		"start": "bun run index.ts start",
-		"start:watch": "bun run --watch index.ts start",
 		"lint:ts": "bun --bun tsc --noEmit",
 		"lint": "bun --bun biome check"
 	},

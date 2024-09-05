@@ -40,12 +40,15 @@ program
 		server.DEFAULT_SERVER_SOCKET,
 	)
 	.action(async (args: StartOptions) => {
-		// process.env.TERMINAL = args.terminal;
+		await server.start({ socketPath: args.socketPath });
 
-		windowManagers.connect(args.manager);
+		const socket = await windowManagers.connect(args.manager);
+		process.on("SIGINT", () => socket.terminate());
+		process.on("SIGTERM", () => socket.terminate());
+		process.on("SIGKILL", () => socket.terminate());
+
 		toggl.initialize();
 		// tmux.start();
-		server.start({ socketPath: args.socketPath });
 	});
 
 program.command("resume").action(async () => {

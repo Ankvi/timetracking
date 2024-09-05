@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { logger } from "../logging";
 import { name } from "../package.json";
@@ -20,6 +20,11 @@ export async function start({ socketPath }: ServerOpts) {
 		await mkdir(CACHE_FOLDER, { recursive: true });
 	}
 
+	if (existsSync(socketPath)) {
+		logger.info("Server already running. Exiting");
+		process.exit(0);
+	}
+
 	const server = Bun.serve({
 		unix: socketPath,
 		async fetch(req) {
@@ -34,12 +39,25 @@ export async function start({ socketPath }: ServerOpts) {
 
 			return Response.json(result);
 		},
+		error: async (error) => {
+			logger.error({
+				error: error.message,
+				message: "Server error",
+			});
+
+			return Response.error();
+		},
 	});
+
+	function stop() {
+		server.stop(true);
+		rmSync(socketPath);
+	}
 
 	logger.info("Socket opened at path", socketPath);
 
-	process.on("SIGINT", () => server.stop());
-	process.on("SIGTERM", () => server.stop());
+	process.on("SIGINT", () => stop());
+	process.on("SIGTERM", () => stop());
 }
 
 export async function sendCommand<T extends keyof EventPayloads>(
