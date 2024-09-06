@@ -77,11 +77,6 @@ export async function stopTimer() {
 	currentTimeEntry = await client.stopTimeEntry(currentTimeEntry);
 }
 
-export function initialize() {
-	process.on("SIGINT", stopTimer);
-	process.on("SIGTERM", stopTimer);
-}
-
 export const command = new Command("toggl");
 command
 	.command("whoami")

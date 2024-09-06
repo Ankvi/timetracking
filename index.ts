@@ -18,7 +18,6 @@ program.option("-v, --verbose");
 
 type StartOptions = {
 	manager: WindowManager;
-	// terminal: string;
 	socketPath: string;
 };
 
@@ -30,25 +29,28 @@ program
 		"Window manager to connect to. Defaults to $XDG_CURRENT_DESKTOP",
 		process.env.XDG_CURRENT_DESKTOP,
 	)
-	// .requiredOption(
-	// 	"-t, --terminal <TERMINAL>",
-	// 	"The WM_CLASS of your used terminal, e.g. Alacritty",
-	// )
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
 		"Optional socket path to use instead of the default one",
 		server.DEFAULT_SERVER_SOCKET,
 	)
 	.action(async (args: StartOptions) => {
-		await server.start({ socketPath: args.socketPath });
+		const serverSocket = await server.start({ socketPath: args.socketPath });
 
-		const socket = await windowManagers.connect(args.manager);
-		process.on("SIGINT", () => socket.terminate());
-		process.on("SIGTERM", () => socket.terminate());
-		process.on("SIGKILL", () => socket.terminate());
+		const wmSocket = await windowManagers.connect(args.manager);
 
-		toggl.initialize();
-		// tmux.start();
+		// const tmuxProcess = tmux.start();
+
+		async function cleanup() {
+			await toggl.stopTimer();
+			await wmSocket.terminate();
+			await serverSocket.stop();
+			// tmuxProcess.kill();
+		}
+
+		process.on("SIGINT", cleanup);
+		process.on("SIGTERM", cleanup);
+		process.on("SIGKILL", cleanup);
 	});
 
 program.command("resume").action(async () => {

@@ -1,5 +1,5 @@
-import { existsSync, rmSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, rm } from "node:fs/promises";
 import { logger } from "@/logging";
 import { name } from "../package.json";
 import { type EventPayloads, handler } from "./handler";
@@ -49,15 +49,14 @@ export async function start({ socketPath }: ServerOpts) {
 		},
 	});
 
-	function stop() {
-		server.stop(true);
-		rmSync(socketPath);
-	}
-
 	logger.info("Socket opened at path", socketPath);
 
-	process.on("SIGINT", () => stop());
-	process.on("SIGTERM", () => stop());
+	return {
+		stop: async () => {
+			server.stop(true);
+			await rm(socketPath);
+		},
+	};
 }
 
 export async function sendCommand<T extends keyof EventPayloads>(
