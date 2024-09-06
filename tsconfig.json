@@ -22,7 +22,13 @@
 		"types": ["bun-types", "node"],
 		"paths": {
 			"@/server": ["./server/index.ts"],
-			"@/server/*": ["./server/*"]
+			"@/server/*": ["./server/*"],
+			"@/logging": ["./logging.ts"],
+			"@/types": ["./types.ts"],
+			"@/tmux": ["./tmux/index.ts"],
+			"@/tmux/*": ["./tmux/*"],
+			"@/toggl": ["./toggl/index.ts"],
+			"@/toggl/*": ["./toggl/*"]
 		}
 	},
 	"exclude": ["node_modules"]

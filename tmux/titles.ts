@@ -1,4 +1,4 @@
-import type { Project } from "../types";
+import type { Project } from "@/types";
 import type { TmuxPaneTitle, TmuxPaneTitleParts } from "./types";
 
 export function getProject(title: TmuxPaneTitle): Project {

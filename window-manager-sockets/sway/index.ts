@@ -1,6 +1,6 @@
+import { logger } from "@/logging";
 import { sendCommand } from "@/server";
 import { $, connect } from "bun";
-import { logger } from "../../logging";
 import type { WMSocket } from "../types";
 import {
 	Command,
@@ -83,7 +83,7 @@ async function processIpcMessages(buffer: Buffer) {
 						});
 						return;
 					}
-					logger.info({
+					logger.debug({
 						message: "unprocessed sway window event",
 						type: event.change,
 					});

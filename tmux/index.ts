@@ -1,4 +1,4 @@
-import { logger } from "../logging";
+import { logger } from "@/logging";
 import { handleEvent } from "./events";
 import { updatePanes } from "./panes";
 

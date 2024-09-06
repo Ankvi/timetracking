@@ -1,8 +1,8 @@
-import { logger } from "../../../logging";
-import { getProject } from "../../../tmux/titles";
-import type { TmuxPaneTitle } from "../../../tmux/types";
-import { startTimer } from "../../../toggl";
-import type { Branch, BranchType, Team } from "../../../types";
+import { logger } from "@/logging";
+import { getProject } from "@/tmux/titles";
+import type { TmuxPaneTitle } from "@/tmux/types";
+import { startTimer } from "@/toggl";
+import type { Branch, BranchType, Team } from "@/types";
 
 type BranchInfo = {
 	fullName: Branch;

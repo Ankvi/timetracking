@@ -1,4 +1,4 @@
-import type { Branch, Directory, ObjectEnum } from "../types";
+import type { Branch, Directory, ObjectEnum } from "@/types";
 
 export const TmuxEventNames = {
 	WindowPaneChanged: "window-pane-changed",

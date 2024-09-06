@@ -1,6 +1,6 @@
 import { existsSync, rmSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { logger } from "../logging";
+import { logger } from "@/logging";
 import { name } from "../package.json";
 import { type EventPayloads, handler } from "./handler";
 
@@ -80,10 +80,4 @@ export async function sendCommand<T extends keyof EventPayloads>(
 			logger.error(error);
 		}
 	}
-	//
-	// const message = (await response.json()) as ServerResponse;
-	// if (!message.success) {
-	// 	logger.warn("Command was unsuccessful:");
-	// 	logger.warn(message);
-	// }
 }

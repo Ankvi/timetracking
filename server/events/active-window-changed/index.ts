@@ -1,4 +1,4 @@
-import type { TmuxPaneTitle } from "../../../tmux/types";
+import type { TmuxPaneTitle } from "@/tmux/types";
 import { handleTerminalActiveEvent } from "./terminal-active-event";
 
 export type ActiveWindowEvent = {

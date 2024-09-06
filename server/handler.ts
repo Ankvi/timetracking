@@ -1,6 +1,6 @@
+import { resumeTimer, stopTimer } from "@/toggl";
+import type { ObjectEnum } from "@/types";
 import { $ } from "bun";
-import { resumeTimer, stopTimer } from "../toggl";
-import type { ObjectEnum } from "../types";
 import {
 	type ActiveWindowEvent,
 	activeWindowEventHandler,

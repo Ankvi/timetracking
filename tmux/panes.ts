@@ -1,6 +1,6 @@
+import { logger } from "@/logging";
+import type { Directory, Project } from "@/types";
 import { $ } from "bun";
-import { logger } from "../logging";
-import type { Directory, Project } from "../types";
 import { getProject } from "./titles";
 import type { TmuxPaneId, TmuxPaneTitle } from "./types";
 

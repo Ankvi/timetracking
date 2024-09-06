@@ -1,9 +1,9 @@
 import { join } from "node:path";
+import { logger } from "@/logging";
+import type { ObjectEnum } from "@/types";
 import { $, connect } from "bun";
-import { logger } from "../logging";
-import type { ObjectEnum } from "../types";
+import type { WMSocket } from "../types";
 import { handle as activeWindow } from "./events/active-window";
-import type { WMSocket } from "./types";
 
 type Instance = {
 	instance: string;
