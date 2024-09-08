@@ -1,11 +1,8 @@
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { logger } from "@/logging";
-import { name } from "../package.json";
+import { CACHE_FOLDER } from "../program-data";
 import { type EventPayloads, handler } from "./handler";
-
-const CACHE_FOLDER = `${process.env.HOME}/.cache/${name}`;
-export const DEFAULT_SERVER_SOCKET = `${CACHE_FOLDER}/server.sock`;
 
 type ServerResponse = {
 	success: boolean;
