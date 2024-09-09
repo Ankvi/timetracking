@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { logger } from "@/logging";
-import { CACHE_FOLDER } from "../program-data";
+import { CACHE_FOLDER, DEFAULT_SERVER_SOCKET } from "../program-data";
 import { type EventPayloads, handler } from "./handler";
 
 type ServerResponse = {

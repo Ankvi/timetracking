@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { logger } from "./logging";
+import { DEFAULT_SERVER_SOCKET } from "./program-data";
 import * as server from "./server";
 import * as tmux from "./tmux";
 import * as toggl from "./toggl";
@@ -32,7 +33,7 @@ program
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
 		"Optional socket path to use instead of the default one",
-		server.DEFAULT_SERVER_SOCKET,
+		DEFAULT_SERVER_SOCKET,
 	)
 	.action(async (args: StartOptions) => {
 		const serverSocket = await server.start({ socketPath: args.socketPath });
@@ -66,7 +67,7 @@ program
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
 		"Optional socket path to use instead of the default one",
-		server.DEFAULT_SERVER_SOCKET,
+		DEFAULT_SERVER_SOCKET,
 	)
 	.action(server.sendCommand);
 
