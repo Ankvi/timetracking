@@ -1,10 +1,11 @@
-import { resumeTimer, stopTimer } from "@/toggl";
-import type { ObjectEnum } from "@/types";
+import { resumeTimer, startTimer, stopTimer } from "@/toggl";
+import type { BranchType, ObjectEnum, Team } from "@/types";
 import { $ } from "bun";
 import {
 	type ActiveWindowEvent,
 	activeWindowEventHandler,
 } from "./events/active-window-changed";
+import type { StartTimeTrackerEvent } from "./events/start-time-tracker";
 
 export const EventNames = {
 	Shutdown: "shutdown",
@@ -21,9 +22,7 @@ export type EventPayloads = {
 	[EventNames.Shutdown]: never;
 	[EventNames.Pause]: undefined;
 	[EventNames.Resume]: undefined;
-	[EventNames.StartTimeTracker]: {
-		team: string;
-	};
+	[EventNames.StartTimeTracker]: StartTimeTrackerEvent;
 	[EventNames.ActiveWindowChanged]: ActiveWindowEvent;
 };
 
@@ -55,6 +54,11 @@ export async function handler<T extends keyof EventPayloads>(
 			case EventNames.ActiveWindowChanged: {
 				await activeWindowEventHandler(body as ActiveWindowEvent);
 				break;
+			}
+
+			case EventNames.StartTimeTracker: {
+				const { type, team, number } = body as StartTimeTrackerEvent;
+				await startTimer(type, team, number);
 			}
 		}
 

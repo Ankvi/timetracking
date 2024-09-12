@@ -14,6 +14,7 @@ export const BranchType = {
 	Hotfix: "hotfix",
 	Cleanup: "cleanup",
 	Improvement: "improvement",
+	Other: "other",
 } as const;
 
 export type BranchType = ObjectEnum<typeof BranchType>;

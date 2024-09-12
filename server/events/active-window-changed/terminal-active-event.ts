@@ -57,6 +57,6 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 	}
 
 	logger.debug(branchInfo);
-	const { type, team, ticketNumber, name } = branchInfo;
-	await startTimer(type, team, ticketNumber, name);
+	const { type, team, ticketNumber } = branchInfo;
+	await startTimer(type, team, ticketNumber);
 }
