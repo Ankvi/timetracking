@@ -29,7 +29,8 @@ export async function startTimer(
 	}
 
 	const ticketInfo = await getTicket(team, ticketNumber);
-	const taskName = `${type}(${ticketInfo.key}): ${ticketInfo.fields.summary}`;
+	const taskName = `${ticketInfo.key} ${ticketInfo.fields.summary}`;
+	const tags = [type, ticketInfo.key];
 
 	if (currentTimeEntry?.description === taskName && !currentTimeEntry.stop) {
 		logger.debug("Time entry for task already running");
@@ -41,6 +42,7 @@ export async function startTimer(
 		taskName,
 		project.id,
 		user.default_workspace_id,
+		tags,
 	);
 }
 
@@ -59,6 +61,7 @@ export async function resumeTimer() {
 		currentTimeEntry.description,
 		currentTimeEntry.project_id,
 		currentTimeEntry.workspace_id,
+		currentTimeEntry.tags,
 	);
 }
 
@@ -77,6 +80,18 @@ export async function stopTimer() {
 	currentTimeEntry = await client.stopTimeEntry(currentTimeEntry);
 }
 
+export async function getCurrentTimeEntry(): Promise<
+	CurrentTimeEntry | undefined
+> {
+	if (currentTimeEntry) {
+		return currentTimeEntry;
+	}
+
+	currentTimeEntry = await client.getCurrentTimeEntry();
+
+	return currentTimeEntry;
+}
+
 export const command = new Command("toggl");
 command
 	.command("whoami")
@@ -89,7 +104,7 @@ command
 	.command("current-entry")
 	.description("Print the current running time entry")
 	.action(async () => {
-		const currentTimeEntry = await client.getCurrentTimeEntry();
+		const currentTimeEntry = await getCurrentTimeEntry();
 		logger.info(currentTimeEntry);
 	});
 command

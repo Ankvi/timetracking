@@ -53,6 +53,7 @@ export async function startTimeEntry(
 	description: string,
 	projectId?: number,
 	workspaceId?: number,
+	tags?: string[],
 ): Promise<CurrentTimeEntry | undefined> {
 	try {
 		const timeEntry: TimeEntryRequest = {
@@ -62,6 +63,7 @@ export async function startTimeEntry(
 			created_with: "timetracking",
 			duration: -1,
 			start: new Date(),
+			tags,
 		};
 
 		if (!timeEntry.workspace_id) {

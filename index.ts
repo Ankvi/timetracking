@@ -63,6 +63,26 @@ program.command("pause").action(async () => {
 });
 
 program
+	.command("current-entry")
+	.option("-t, --ticket", "Prints the ticket number")
+	.action(async ({ ticket }: { ticket: boolean }) => {
+		const currentTimeEntry = await toggl.getCurrentTimeEntry();
+		if (!currentTimeEntry) {
+			return;
+		}
+
+		if (ticket) {
+			const match = /^[A-Z]+-\d+/.exec(currentTimeEntry.description);
+			if (match?.length) {
+				console.info(match[0]);
+				return;
+			}
+		}
+
+		console.info(currentTimeEntry.description);
+	});
+
+program
 	.command("send <event> <payload>")
 	.option(
 		"-s, --socketPath <SOCKET_PATH>",
