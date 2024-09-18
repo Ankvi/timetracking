@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { logger } from "@/logging";
+import { ServerNotRunningError } from "@/types";
 import { CACHE_FOLDER, DEFAULT_SERVER_SOCKET } from "../program-data";
 import { type EventPayloads, handler } from "./handler";
 
@@ -56,6 +57,19 @@ export async function start({ socketPath }: ServerOpts) {
 	};
 }
 
+export async function stop({ socketPath }: ServerOpts) {
+	try {
+		if (!existsSync(socketPath)) {
+			return;
+		}
+		await sendCommand("shutdown", undefined);
+	} catch (error) {
+		if (error instanceof ServerNotRunningError) {
+			await rm(socketPath);
+		}
+	}
+}
+
 export async function sendCommand<T extends keyof EventPayloads>(
 	event: T,
 	data: EventPayloads[T],
@@ -71,7 +85,7 @@ export async function sendCommand<T extends keyof EventPayloads>(
 		if (error instanceof Error) {
 			if (error.name === "FailedToOpenSocket") {
 				logger.info("Timetracking server is currently not running");
-				return;
+				throw new ServerNotRunningError();
 			}
 			logger.error(error);
 		}

@@ -26,3 +26,5 @@ export const Team = {
 } as const;
 
 export type Team = ObjectEnum<typeof Team>;
+
+export class ServerNotRunningError extends Error {}

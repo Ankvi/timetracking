@@ -6,6 +6,7 @@ import { DEFAULT_SERVER_SOCKET } from "./program-data";
 import * as server from "./server";
 import * as tmux from "./tmux";
 import * as toggl from "./toggl";
+import { ServerNotRunningError } from "./types";
 import * as windowManagers from "./window-manager-sockets";
 import type { WindowManager } from "./window-manager-sockets/types";
 
@@ -17,9 +18,8 @@ type BaseOptions = {
 
 program.option("-v, --verbose");
 
-type StartOptions = {
+type StartOptions = server.ServerOpts & {
 	manager: WindowManager;
-	socketPath: string;
 };
 
 program
@@ -61,6 +61,17 @@ program.command("resume").action(async () => {
 program.command("pause").action(async () => {
 	await server.sendCommand("pause", undefined);
 });
+
+program
+	.command("stop")
+	.option(
+		"-s, --socketPath <SOCKET_PATH>",
+		"Optional socket path to use instead of the default one",
+		DEFAULT_SERVER_SOCKET,
+	)
+	.action(async (opts: server.ServerOpts) => {
+		await server.stop(opts);
+	});
 
 program
 	.command("current-entry")

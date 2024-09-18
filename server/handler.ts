@@ -19,7 +19,7 @@ export const EventNames = {
 export type EventNames = ObjectEnum<typeof EventNames>;
 
 export type EventPayloads = {
-	[EventNames.Shutdown]: never;
+	[EventNames.Shutdown]: undefined;
 	[EventNames.Pause]: undefined;
 	[EventNames.Resume]: undefined;
 	[EventNames.StartTimeTracker]: StartTimeTrackerEvent;
