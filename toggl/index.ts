@@ -5,7 +5,7 @@ import type { CurrentTimeEntry } from "./types";
 import { logger } from "@/logging";
 import { sendCommand } from "@/server";
 import { getTicket } from "../jira";
-import { isOnline } from "../network";
+import { isOnline, waitForOnlineState } from "../network";
 import * as client from "./client";
 
 let currentTimeEntry: CurrentTimeEntry | undefined;
@@ -98,25 +98,7 @@ export async function stopTimer(checkOnlineStatus = false) {
 	logger.debug("Stopping active toggl timer");
 
 	if (checkOnlineStatus) {
-		let retries = 0;
-		let online = false;
-		while (retries < 5) {
-			online = await isOnline();
-			if (online) {
-				break;
-			}
-
-			logger.debug("Device is offline. Retrying");
-
-			retries++;
-
-			await Bun.sleep(1000);
-		}
-
-		if (!online) {
-			logger.warn("Unable to stop timer as device is offline");
-			return;
-		}
+		await waitForOnlineState("stopTimer");
 	}
 
 	currentTimeEntry = await client.updateTimeEntry(currentTimeEntry);

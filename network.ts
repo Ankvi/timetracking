@@ -53,6 +53,31 @@ export async function isOnline() {
 	return connections.some((connection) => connection.CONNECTIVITY === "full");
 }
 
+export async function waitForOnlineState(operation: string): Promise<true> {
+	let retries = 0;
+	let online = false;
+	while (retries < 5) {
+		online = await isOnline();
+		if (online) {
+			break;
+		}
+
+		logger.debug("Device is offline. Retrying");
+
+		retries++;
+
+		await Bun.sleep(1000);
+	}
+
+	if (!online) {
+		throw new Error(
+			`Unable to perform operation '${operation}' as device is offline`,
+		);
+	}
+
+	return online;
+}
+
 if (import.meta.main) {
 	await getNetworkConnections();
 }
