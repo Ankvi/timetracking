@@ -109,6 +109,8 @@ export async function stopTimer(checkOnlineStatus = false) {
 			logger.debug("Device is offline. Retrying");
 
 			retries++;
+
+			await Bun.sleep(1000);
 		}
 
 		if (!online) {
