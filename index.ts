@@ -62,6 +62,14 @@ program.command("pause").action(async () => {
 	await server.sendCommand("pause", undefined);
 });
 
+program.command("before-sleep").action(async () => {
+	await server.sendCommand("before-sleep", undefined);
+});
+
+program.command("after-awake").action(async () => {
+	await server.sendCommand("after-awake", undefined);
+});
+
 program
 	.command("stop")
 	.option(

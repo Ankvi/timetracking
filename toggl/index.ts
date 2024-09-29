@@ -5,6 +5,7 @@ import type { CurrentTimeEntry } from "./types";
 import { logger } from "@/logging";
 import { sendCommand } from "@/server";
 import { getTicket } from "../jira";
+import { isOnline } from "../network";
 import * as client from "./client";
 
 let currentTimeEntry: CurrentTimeEntry | undefined;
@@ -13,6 +14,7 @@ export async function startTimer(
 	type: BranchType,
 	team: Team,
 	ticketNumber: number,
+	name = "unknown",
 ) {
 	const user = await client.me();
 
@@ -28,9 +30,13 @@ export async function startTimer(
 		currentTimeEntry = await client.getCurrentTimeEntry();
 	}
 
-	const ticketInfo = await getTicket(team, ticketNumber);
-	const taskName = `${ticketInfo.key} ${ticketInfo.fields.summary}`;
-	const tags = [type, ticketInfo.key];
+	let taskName = name;
+	const tags: string[] = [type];
+	if (ticketNumber > 0) {
+		const ticketInfo = await getTicket(team, ticketNumber);
+		taskName = `${ticketInfo.key} ${ticketInfo.fields.summary}`;
+		tags.push(ticketInfo.key);
+	}
 
 	if (currentTimeEntry?.description === taskName && !currentTimeEntry.stop) {
 		logger.debug("Time entry for task already running");
@@ -65,9 +71,9 @@ export async function resumeTimer() {
 	);
 }
 
-export async function stopTimer() {
+export function setStopTimestamp() {
 	if (!currentTimeEntry) {
-		logger.debug("No timers to stop");
+		logger.debug("No timers running");
 		return;
 	}
 
@@ -76,8 +82,42 @@ export async function stopTimer() {
 		return;
 	}
 
+	currentTimeEntry.stop = new Date().toISOString();
+}
+
+export async function stopTimer(checkOnlineStatus = false) {
+	if (!currentTimeEntry) {
+		logger.debug("No timers running");
+		return;
+	}
+
+	if (!currentTimeEntry.stop) {
+		setStopTimestamp();
+	}
+
 	logger.debug("Stopping active toggl timer");
-	currentTimeEntry = await client.stopTimeEntry(currentTimeEntry);
+
+	if (checkOnlineStatus) {
+		let retries = 0;
+		let online = false;
+		while (retries < 5) {
+			online = await isOnline();
+			if (online) {
+				break;
+			}
+
+			logger.debug("Device is offline. Retrying");
+
+			retries++;
+		}
+
+		if (!online) {
+			logger.warn("Unable to stop timer as device is offline");
+			return;
+		}
+	}
+
+	currentTimeEntry = await client.updateTimeEntry(currentTimeEntry);
 }
 
 export async function getCurrentTimeEntry(): Promise<

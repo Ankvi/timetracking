@@ -20,18 +20,18 @@ function createMessage<T extends keyof CommandPayloads>(
 ) {
 	const stringified = JSON.stringify(payload);
 	const message = Buffer.alloc(HEADER_LENGTH + stringified.length);
-	MAGIC.copy(message);
+	message.write(MAGIC);
 	message.writeUInt32LE(stringified.length, MAGIC_LENGTH);
 	message.writeUInt32LE(type, 10);
 	if (stringified.length > 0) {
 		message.write(stringified, HEADER_LENGTH);
 	}
-	return message;
+	return Uint8Array.from(message);
 }
 
 function decodeHeader(buffer: Buffer): MessageHeader {
 	const magic = buffer.subarray(0, MAGIC_LENGTH);
-	if (!magic.equals(MAGIC)) {
+	if (magic.toString() !== MAGIC) {
 		throw new Error(`Magic mismatch. Expected ${MAGIC}, but found ${magic}`);
 	}
 	const payloadLength = buffer.readUInt32LE(MAGIC_LENGTH);

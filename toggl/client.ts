@@ -108,6 +108,19 @@ export async function stopTimeEntry(timeEntry: CurrentTimeEntry) {
 	return (await response.json()) as CurrentTimeEntry;
 }
 
+export async function updateTimeEntry(timeEntry: CurrentTimeEntry) {
+	const response = await fetch(
+		`${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries/${timeEntry.id}`,
+		{
+			method: "PUT",
+			headers,
+			body: JSON.stringify(timeEntry),
+		},
+	);
+
+	return (await response.json()) as CurrentTimeEntry;
+}
+
 export async function workspaces(): Promise<Workspace[]> {
 	const response = await fetch(`${ME_URL}/workspaces`, {
 		headers,

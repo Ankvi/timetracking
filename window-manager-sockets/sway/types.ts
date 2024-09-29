@@ -18,7 +18,7 @@ export const Command = {
 
 export type Command = ObjectEnum<typeof Command>;
 
-export const MAGIC = Buffer.from("i3-ipc");
+export const MAGIC = "i3-ipc";
 export const MAGIC_LENGTH = MAGIC.length;
 export const HEADER_LENGTH = MAGIC_LENGTH + 8;
 

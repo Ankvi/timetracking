@@ -1,5 +1,5 @@
-import { resumeTimer, startTimer, stopTimer } from "@/toggl";
-import type { BranchType, ObjectEnum, Team } from "@/types";
+import { resumeTimer, setStopTimestamp, startTimer, stopTimer } from "@/toggl";
+import type { ObjectEnum } from "@/types";
 import { $ } from "bun";
 import {
 	type ActiveWindowEvent,
@@ -11,6 +11,8 @@ export const EventNames = {
 	Shutdown: "shutdown",
 	Pause: "pause",
 	Resume: "resume",
+	BeforeSleep: "before-sleep",
+	AfterAwake: "after-awake",
 	StartTimeTracker: "start-time-tracker",
 	GitBranchChanged: "git-branch-changed",
 	ActiveWindowChanged: "active-window-changed",
@@ -22,6 +24,8 @@ export type EventPayloads = {
 	[EventNames.Shutdown]: undefined;
 	[EventNames.Pause]: undefined;
 	[EventNames.Resume]: undefined;
+	[EventNames.BeforeSleep]: undefined;
+	[EventNames.AfterAwake]: undefined;
 	[EventNames.StartTimeTracker]: StartTimeTrackerEvent;
 	[EventNames.ActiveWindowChanged]: ActiveWindowEvent;
 };
@@ -48,6 +52,16 @@ export async function handler<T extends keyof EventPayloads>(
 
 			case EventNames.Pause: {
 				await stopTimer();
+				break;
+			}
+
+			case EventNames.BeforeSleep: {
+				setStopTimestamp();
+				break;
+			}
+
+			case EventNames.AfterAwake: {
+				await stopTimer(true);
 				break;
 			}
 
