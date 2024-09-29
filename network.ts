@@ -4,7 +4,7 @@ import { logger } from "./logging";
 type EnableState = "enabled" | "disabled" | "missing";
 
 type NmcliConnection = {
-	STATE: "connected" | "connected (local only)";
+	STATE: "connected" | "connected (local only)" | "asleep" | "disconnected";
 	CONNECTIVITY: "full" | "none";
 	"WIFI-HW": EnableState;
 	WIFI: EnableState;
