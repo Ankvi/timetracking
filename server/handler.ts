@@ -1,3 +1,4 @@
+import { logger } from "@/logging";
 import { resumeTimer, setStopTimestamp, startTimer, stopTimer } from "@/toggl";
 import type { ObjectEnum } from "@/types";
 import { $ } from "bun";
@@ -79,6 +80,7 @@ export async function handler<T extends keyof EventPayloads>(
 		// return { success: true };
 	} catch (error) {
 		if (error instanceof Error) {
+			logger.warn(error);
 			await $`notify-send "Timetracking error" "${error.message}"`;
 		}
 	}
