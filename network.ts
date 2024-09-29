@@ -78,6 +78,8 @@ export async function waitForOnlineState(operation: string): Promise<true> {
 	return online;
 }
 
+// TODO: Use `nmcli monitor` to keep a state instead of prompting?
+
 if (import.meta.main) {
 	await getNetworkConnections();
 }
