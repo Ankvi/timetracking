@@ -43,7 +43,7 @@ program
 		// const tmuxProcess = tmux.start();
 
 		async function cleanup() {
-			await toggl.stopTimer();
+			await toggl.stopTimer().catch(() => logger.warn("Stopping timer failed"));
 			await wmSocket.terminate();
 			await serverSocket.stop();
 			// tmuxProcess.kill();

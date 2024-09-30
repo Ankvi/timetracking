@@ -80,6 +80,8 @@ export async function waitForOnlineState(operation: string): Promise<true> {
 
 // TODO: Use `nmcli monitor` to keep a state instead of prompting?
 
+// export async function fetchWithRetry()
+
 if (import.meta.main) {
 	await getNetworkConnections();
 }

@@ -5,7 +5,7 @@ import type { CurrentTimeEntry } from "./types";
 import { logger } from "@/logging";
 import { sendCommand } from "@/server";
 import { getTicket } from "../jira";
-import { isOnline, waitForOnlineState } from "../network";
+import { waitForOnlineState } from "../network";
 import * as client from "./client";
 
 let currentTimeEntry: CurrentTimeEntry | undefined;
@@ -82,7 +82,9 @@ export function setStopTimestamp() {
 		return;
 	}
 
-	currentTimeEntry.stop = new Date().toISOString();
+	const stop = new Date();
+	currentTimeEntry.stop = stop.toISOString();
+	currentTimeEntry.duration = null as unknown as number;
 }
 
 export async function stopTimer(checkOnlineStatus = false) {

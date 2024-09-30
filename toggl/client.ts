@@ -19,18 +19,28 @@ const headers = {
 	Authorization: `Basic ${credentials}`,
 };
 
-let currentUser: Promise<User>;
+let currentUser: User;
 
 export async function me(): Promise<User> {
 	if (currentUser) {
 		return currentUser;
 	}
 
-	currentUser = fetch(`${ME_URL}?with_related_data=true`, {
-		headers,
-	}).then((response) => response.json()) as Promise<User>;
+	logger.debug("Retrieving user");
 
-	return await currentUser;
+	const response = await fetch(`${ME_URL}?with_related_data=true`, {
+		headers,
+	});
+
+	if (!response.ok) {
+		throw new Error("Unable to retrieve user");
+	}
+
+	currentUser = (await response.json()) as User;
+
+	console.log(currentUser);
+
+	return currentUser;
 }
 
 export async function getCurrentTimeEntry(): Promise<
@@ -117,6 +127,10 @@ export async function updateTimeEntry(timeEntry: CurrentTimeEntry) {
 			body: JSON.stringify(timeEntry),
 		},
 	);
+
+	if (!response.ok) {
+		throw new Error(`Unable to update time entry: \n${await response.text()}`);
+	}
 
 	return (await response.json()) as CurrentTimeEntry;
 }

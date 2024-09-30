@@ -23,6 +23,7 @@ export const Team = {
 	CustomerIdentity: "CID",
 	Flash: "FLASH",
 	ITDS: "ITDS",
+	Other: "OTHER",
 } as const;
 
 export type Team = ObjectEnum<typeof Team>;
