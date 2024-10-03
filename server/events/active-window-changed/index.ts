@@ -2,17 +2,17 @@ import type { TmuxPaneTitle } from "@/tmux/types";
 import { handleTerminalActiveEvent } from "./terminal-active-event";
 
 export type ActiveWindowEvent = {
-	application: string;
-	title: string;
+    application: string;
+    title: string;
 };
 
 const terminals = ["Alacritty"];
 
 export async function activeWindowEventHandler({
-	application,
-	title,
+    application,
+    title,
 }: ActiveWindowEvent) {
-	if (terminals.includes(application)) {
-		return await handleTerminalActiveEvent(title as TmuxPaneTitle);
-	}
+    if (terminals.includes(application)) {
+        return await handleTerminalActiveEvent(title as TmuxPaneTitle);
+    }
 }

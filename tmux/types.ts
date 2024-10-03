@@ -1,7 +1,7 @@
 import type { Branch, Directory, ObjectEnum } from "@/types";
 
 export const TmuxEventNames = {
-	WindowPaneChanged: "window-pane-changed",
+    WindowPaneChanged: "window-pane-changed",
 } as const;
 
 export type TmuxEventNames = ObjectEnum<typeof TmuxEventNames>;
