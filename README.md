@@ -1,15 +1,19 @@
-# timetracking
+# Timetracking
 
-To install dependencies:
+Welcome to the linux automated time tracker!
 
-```bash
-bun install
-```
+## How it works
 
-To run:
+By starting listeners on certain OS window manager (e.g. Swaywm or Hyprland), we can automatically detect
+when your designated editor is the currently focused window.
 
-```bash
-bun run index.ts
-```
+### Prerequisites
 
-This project was created using `bun init` in bun v1.1.23. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+- Specific branch naming convention
+  - {BRANCH_TYPE}/{JIRA_TEAM}-{JIRA_TICKET_NUMBER}-something-descriptive
+  - e.g. `feature/CID-1337-something`
+- An editor with a specific title naming convention
+  - e.g. `tmux | {DIRECTORY} | {CURRENT_GIT_BRANCH}`
+- A toggl time tracker account with a generated personal access token (PAT)
+- Toggl projects that match the name of the Jira teams (e.g. CID, OTHER)
+- A generated PAT for Jira
