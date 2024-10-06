@@ -1,17 +1,17 @@
 import type { Team } from "../types";
 
 export type Workspace = {
-    id: string;
-    organization_id: string;
+    id: number;
+    organization_id: number;
     name: string;
 };
 
 export type User = {
-    id: string;
+    id: number;
     email: string;
     fullname: string;
     timezone: string;
-    default_workspace_id: number;
+    default_workspace_id: Workspace["id"];
     projects: Project[];
 };
 
@@ -25,51 +25,45 @@ export type TimeEntryRequest = {
     created_with: string;
     description?: string;
     duration: number;
-    // pid: number;
-    project_id?: number;
+    project_id?: Project["id"];
     shared_with_user_ids?: number[];
     start: Date;
-    // start_date: string;
     stop?: string;
     tag_action?: "add" | "delete";
     tag_ids?: number[];
     tags?: string[];
-    task_id?: number;
-    // tid: number;
-    // uid: number;
-    user_id?: number;
-    // wid: number;
-    workspace_id: number;
+    workspace_id: Workspace["id"];
 };
 
-export type CurrentTimeEntry = {
+/**
+ * Extra fields that will be present, but we don't really
+ * care about. We'll keep track of some of them here, but
+ * we won't use them.
+ */
+type ExtraTimeEntryFields = {
     at: string;
     billable: boolean;
     client_name: string;
-    description: string;
-    duration: number;
-    duronly: boolean;
-    id: number;
     permissions: string[];
-    pid: number;
     project_active: boolean;
     project_billable: boolean;
     project_color: string;
-    project_id?: number;
-    project_name: string;
-    shared_with_user_ids: [number];
-    start: string;
-    stop?: string;
-    tag_ids: [number];
-    tags: [string];
-    task_id?: number;
-    task_name: string;
-    tid: number;
-    uid: number;
+    shared_with_user_ids: number[];
     user_id: number;
     user_name: string;
-    wid: number;
-    workspace_id: number;
+    tag_ids: number[];
+};
+
+export type CurrentTimeEntry = {
+    description: string;
+    duration?: number;
+    id: number;
+    project_id?: Project["id"];
+    project_name?: string;
+    start: string;
+    stop?: string;
+    tags: string[];
+    workspace_id: Workspace["id"];
 };
 
 export type Project = {
