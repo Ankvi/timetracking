@@ -1,5 +1,7 @@
+import axios from "axios";
+import { differenceInSeconds } from "date-fns";
 import type { Team } from "../types";
-import type { Ticket } from "./types";
+import type { Ticket, TicketInfo, TimeTrackRequest } from "./types";
 
 const BASE_URL = "https://elkjop.atlassian.net/rest/api/3";
 
@@ -12,19 +14,39 @@ const headers = new Headers({
     Accept: "application/json",
 });
 
-const ticketCache = new Map<{ team: Team; number: number }, Ticket>();
+const client = axios.create({
+    headers: {
+        Accept: "application/json",
+        Authorization: `Basic ${credentials}`,
+    },
+    baseURL: BASE_URL,
+});
 
-export async function getTicket(team: Team, number: number): Promise<Ticket> {
+const ticketCache = new Map<{ team: Team; number: number }, TicketInfo>();
+
+export async function getTicket(
+    team: Team,
+    number: number,
+): Promise<TicketInfo> {
     let ticket = ticketCache.get({ team, number });
     if (ticket) {
         return ticket;
     }
 
-    const response = await fetch(`${BASE_URL}/issue/${team}-${number}`, {
-        headers,
-    });
+    const response = await client.get<TicketInfo>(`issue/${team}-${number}`);
 
-    ticket = (await response.json()) as Ticket;
+    ticket = response.data;
     ticketCache.set({ team, number }, ticket);
     return ticket;
+}
+
+export async function addTrackedTime(ticket: Ticket, start: Date, end: Date) {
+    const seconds = differenceInSeconds(end, start);
+
+    const body: TimeTrackRequest = {
+        started: start.toISOString(),
+        timeSpentSeconds: seconds,
+    };
+
+    await client.post(`issue/${ticket}/worklog`, body);
 }

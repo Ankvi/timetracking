@@ -1,4 +1,4 @@
-import { type BranchType, Team } from "@/types";
+import { type TaskType, Team } from "@/types";
 import { Command } from "commander";
 import type { CurrentTimeEntry } from "./types";
 
@@ -11,7 +11,7 @@ import * as client from "./client";
 let currentTimeEntry: CurrentTimeEntry | undefined;
 
 export async function startTimer(
-    type: BranchType,
+    type: TaskType,
     team: Team,
     ticketNumber: number,
     name = "unknown",
@@ -30,22 +30,36 @@ export async function startTimer(
         currentTimeEntry = await client.getCurrentTimeEntry();
     }
 
+    let ticket: string = team;
     let taskName = name;
     const tags: string[] = [type];
     if (ticketNumber > 0) {
-        const ticketInfo = await getTicket(team, ticketNumber);
-        taskName = `${ticketInfo.key} ${ticketInfo.fields.summary}`;
-        tags.push(ticketInfo.key);
+        ticket = `${team}-${ticketNumber}`;
+        try {
+            const ticketInfo = await getTicket(team, ticketNumber);
+            tags.push(ticketInfo.key);
+            taskName = ticketInfo.fields.summary;
+        } catch (error) {
+            logger.warn({
+                message: "unable to get ticket info from Jira",
+                error: error instanceof Error ? error.message : error,
+            });
+        }
     }
 
-    if (currentTimeEntry?.description === taskName && !currentTimeEntry.stop) {
+    const description = `${ticket} ${taskName}`;
+
+    if (
+        currentTimeEntry?.description === description &&
+        !currentTimeEntry.stop
+    ) {
         logger.debug("Time entry for task already running");
         return;
     }
 
-    logger.info(`Starting time entry with description: ${taskName}`);
+    logger.info(`Starting time entry with description: ${description}`);
     currentTimeEntry = await client.startTimeEntry(
-        taskName,
+        description,
         project.id,
         user.default_workspace_id,
         tags,
@@ -144,7 +158,7 @@ command
     });
 
 type StartOptions = {
-    type?: BranchType;
+    type?: TaskType;
 };
 
 command

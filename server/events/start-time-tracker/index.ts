@@ -1,7 +1,7 @@
-import type { BranchType, Team } from "@/types";
+import type { TaskType, Team } from "@/types";
 
 export type StartTimeTrackerEvent = {
-    type: BranchType;
+    type: TaskType;
     team: Team;
     number: number;
     name?: string;

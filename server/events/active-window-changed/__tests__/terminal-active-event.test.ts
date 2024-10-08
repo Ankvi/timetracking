@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BranchType, Team } from "@/types";
+import { TaskType, Team } from "@/types";
 import { extractBranchInfo } from "../terminal-active-event";
 
 describe("extractBranchInfo tests", () => {

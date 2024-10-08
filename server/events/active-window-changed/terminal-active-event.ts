@@ -2,11 +2,11 @@ import { logger } from "@/logging";
 import { getProject } from "@/tmux/titles";
 import type { TmuxPaneTitle } from "@/tmux/types";
 import { startTimer } from "@/toggl";
-import { type Branch, BranchType, type Team } from "@/types";
+import type { Branch, TaskType, Team } from "@/types";
 
 type BranchInfo = {
     fullName: Branch;
-    type: BranchType;
+    type: TaskType;
     team: Team;
     ticketNumber: number;
     name: string;
@@ -28,7 +28,7 @@ export function extractBranchInfo(branch: Branch): BranchInfo | null {
     const [fullName, type, team, ticketNumber, name] = result;
     return {
         fullName,
-        type: (type as BranchType) ?? BranchType.Other,
+        type: (type as TaskType) ?? BranchType.Other,
         team: team as Team,
         ticketNumber: Number.parseInt(ticketNumber, 10),
         name,

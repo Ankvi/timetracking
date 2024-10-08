@@ -8,7 +8,7 @@ export type Project = {
     branch: Branch;
 };
 
-export const BranchType = {
+export const TaskType = {
     Feature: "feature",
     Bug: "bug",
     Hotfix: "hotfix",
@@ -17,7 +17,7 @@ export const BranchType = {
     Other: "other",
 } as const;
 
-export type BranchType = ObjectEnum<typeof BranchType>;
+export type TaskType = ObjectEnum<typeof TaskType>;
 
 export const Team = {
     CustomerIdentity: "CID",

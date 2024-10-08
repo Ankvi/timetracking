@@ -1,4 +1,5 @@
 import { logger } from "@/logging";
+import axios from "axios";
 import type {
     Client,
     CurrentTimeEntry,
@@ -7,9 +8,9 @@ import type {
     Workspace,
 } from "./types";
 
-const BASE_URL = "https://api.track.toggl.com/api";
-const ME_URL = `${BASE_URL}/v9/me`;
-const WORKSPACES_URL = `${BASE_URL}/v9/workspaces`;
+const BASE_URL = "https://api.track.toggl.com/api/v9";
+const ME_URL = `${BASE_URL}/me`;
+const WORKSPACES_URL = `${BASE_URL}/workspaces`;
 
 const credentials = Buffer.from(
     `${Bun.env.TOGGL_API_TOKEN}:api_token`,
@@ -18,6 +19,13 @@ const credentials = Buffer.from(
 const headers = {
     Authorization: `Basic ${credentials}`,
 };
+
+const client = axios.create({
+    headers: {
+        Authorization: `Basic ${credentials}`,
+    },
+    baseURL: BASE_URL,
+});
 
 let currentUser: User;
 
@@ -28,16 +36,21 @@ export async function me(): Promise<User> {
 
     logger.debug("Retrieving user");
 
-    const response = await fetch(`${ME_URL}?with_related_data=true`, {
-        headers,
+    // const response = await fetch(`${ME_URL}?with_related_data=true`, {
+    //     headers,
+    // });
+    const response = await client.get<User>("me", {
+        params: {
+            with_related_data: true,
+        },
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
         throw new Error("Unable to retrieve user");
     }
 
-    currentUser = (await response.json()) as User;
-
+    // currentUser = (await response.json()) as User;
+    currentUser = response.data;
     return currentUser;
 }
 
