@@ -126,6 +126,7 @@ command
         const me = await client.me();
         logger.info(me);
     });
+
 command
     .command("current-entry")
     .description("Print the current running time entry")
@@ -133,6 +134,7 @@ command
         const currentTimeEntry = await getCurrentTimeEntry();
         logger.info(currentTimeEntry);
     });
+
 command
     .command("workspaces")
     .description("Print all workspaces available to the current account")
@@ -163,5 +165,6 @@ command
             type: type ?? "other",
             team,
             number: parsedTicketNumber,
+            name: "meeting",
         });
     });

@@ -72,8 +72,9 @@ export async function handler<T extends keyof EventPayloads>(
             }
 
             case EventNames.StartTimeTracker: {
-                const { type, team, number } = body as StartTimeTrackerEvent;
-                await startTimer(type, team, number);
+                const { type, team, number, name } =
+                    body as StartTimeTrackerEvent;
+                await startTimer(type, team, number, name);
             }
         }
 

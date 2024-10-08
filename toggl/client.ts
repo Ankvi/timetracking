@@ -38,8 +38,6 @@ export async function me(): Promise<User> {
 
     currentUser = (await response.json()) as User;
 
-    console.log(currentUser);
-
     return currentUser;
 }
 

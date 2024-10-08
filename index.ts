@@ -6,7 +6,7 @@ import { DEFAULT_SERVER_SOCKET } from "./program-data";
 import * as server from "./server";
 import * as tmux from "./tmux";
 import * as toggl from "./toggl";
-import { ServerNotRunningError } from "./types";
+import { ServerNotRunningError, Team } from "./types";
 import * as windowManagers from "./window-manager-sockets";
 import type { WindowManager } from "./window-manager-sockets/types";
 
@@ -104,6 +104,19 @@ program
 
         console.info(currentTimeEntry.description);
     });
+
+program.command("meeting <TEAM>").action(async (team: Team) => {
+    if (!Object.values(Team).includes(team)) {
+        throw new Error(`Team ${team} does not exist`);
+    }
+
+    await server.sendCommand("start-time-tracker", {
+        type: "other",
+        team: team,
+        number: 0,
+        name: "meeting",
+    });
+});
 
 program
     .command("send <event> <payload>")
