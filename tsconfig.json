@@ -30,6 +30,5 @@
             "@/toggl": ["./toggl/index.ts"],
             "@/toggl/*": ["./toggl/*"]
         }
-    },
-    "exclude": ["node_modules"]
+    }
 }

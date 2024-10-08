@@ -2,7 +2,7 @@ import { logger } from "@/logging";
 import { getProject } from "@/tmux/titles";
 import type { TmuxPaneTitle } from "@/tmux/types";
 import { startTimer } from "@/toggl";
-import type { Branch, BranchType, Team } from "@/types";
+import { type Branch, BranchType, type Team } from "@/types";
 
 type BranchInfo = {
     fullName: Branch;
@@ -13,9 +13,10 @@ type BranchInfo = {
 };
 
 // Captures the branch type, team, ticket number and name of a branch
-const branchTester = /^([a-z]+)\/([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
+// const branchTester = /^([a-z]+)\/([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
+const branchTester = /(?:([a-z]+)\/)?([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
 
-function extractBranchInfo(branch: Branch): BranchInfo | null {
+export function extractBranchInfo(branch: Branch): BranchInfo | null {
     const result = branchTester.exec(branch);
     if (!result) {
         logger.debug(
@@ -27,7 +28,7 @@ function extractBranchInfo(branch: Branch): BranchInfo | null {
     const [fullName, type, team, ticketNumber, name] = result;
     return {
         fullName,
-        type: type as BranchType,
+        type: (type as BranchType) ?? BranchType.Other,
         team: team as Team,
         ticketNumber: Number.parseInt(ticketNumber, 10),
         name,
