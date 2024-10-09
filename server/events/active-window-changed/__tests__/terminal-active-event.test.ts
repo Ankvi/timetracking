@@ -6,19 +6,19 @@ describe("extractBranchInfo tests", () => {
     test.each([
         [
             "feature/CID-10000-something",
-            BranchType.Feature,
+            TaskType.Feature,
             Team.CustomerIdentity,
             10000,
             "something",
         ],
         [
             "CID-10000-something",
-            BranchType.Other,
+            TaskType.Other,
             Team.CustomerIdentity,
             10000,
             "something",
         ],
-        ["OTHER-1-something", BranchType.Other, Team.Other, 1, "something"],
+        ["OTHER-1-something", TaskType.Other, Team.Other, 1, "something"],
     ])(
         "%p should exact %p, %p, %p and %p",
         (branch, type, team, ticketNumber, name) => {

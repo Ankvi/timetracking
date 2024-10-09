@@ -81,7 +81,7 @@ export async function startTimeEntry(
 
         const response = await client.post<CurrentTimeEntry>(
             `workspaces/${timeEntry.workspace_id}/time_entries`,
-            JSON.stringify(timeEntry),
+            timeEntry,
         );
 
         if (response.status !== HttpStatusCode.Ok) {
