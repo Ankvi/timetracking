@@ -9,11 +9,6 @@ const credentials = Buffer.from(
     `andreas.kvist@elkjop.no:${process.env.JIRA_TOKEN}`,
 ).toString("base64");
 
-const headers = new Headers({
-    Authorization: `Basic ${credentials}`,
-    Accept: "application/json",
-});
-
 const client = axios.create({
     headers: {
         Accept: "application/json",

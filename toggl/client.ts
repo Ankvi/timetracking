@@ -1,5 +1,5 @@
 import { logger } from "@/logging";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import type {
     Client,
     CurrentTimeEntry,
@@ -9,16 +9,10 @@ import type {
 } from "./types";
 
 const BASE_URL = "https://api.track.toggl.com/api/v9";
-const ME_URL = `${BASE_URL}/me`;
-const WORKSPACES_URL = `${BASE_URL}/workspaces`;
 
 const credentials = Buffer.from(
     `${Bun.env.TOGGL_API_TOKEN}:api_token`,
 ).toString("base64");
-
-const headers = {
-    Authorization: `Basic ${credentials}`,
-};
 
 const client = axios.create({
     headers: {
@@ -36,20 +30,16 @@ export async function me(): Promise<User> {
 
     logger.debug("Retrieving user");
 
-    // const response = await fetch(`${ME_URL}?with_related_data=true`, {
-    //     headers,
-    // });
     const response = await client.get<User>("me", {
         params: {
             with_related_data: true,
         },
     });
 
-    if (response.status !== 200) {
+    if (response.status !== HttpStatusCode.Ok) {
         throw new Error("Unable to retrieve user");
     }
 
-    // currentUser = (await response.json()) as User;
     currentUser = response.data;
     return currentUser;
 }
@@ -58,12 +48,10 @@ export async function getCurrentTimeEntry(): Promise<
     CurrentTimeEntry | undefined
 > {
     try {
-        const response = await fetch(`${ME_URL}/time_entries/current`, {
-            headers,
-        });
-
-        const json = await response.json();
-        return json as CurrentTimeEntry;
+        const response = await client.get<CurrentTimeEntry>(
+            "me/time_entries/current",
+        );
+        return response.data;
     } catch (error) {
         logger.warn(error);
         return;
@@ -91,26 +79,19 @@ export async function startTimeEntry(
             throw new Error("Cannot start time entry without a workspace");
         }
 
-        const url = `${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries`;
-        logger.debug(`Starting time entry at url ${url}`);
+        const response = await client.post<CurrentTimeEntry>(
+            `workspaces/${timeEntry.workspace_id}/time_entries`,
+            JSON.stringify(timeEntry),
+        );
 
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                ...headers,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(timeEntry),
-        });
-
-        if (!response.ok) {
+        if (response.status !== HttpStatusCode.Ok) {
             logger.warn(
-                `Start time entry request was not successful: ${response.status} - ${await response.text()}`,
+                `Start time entry request was not successful: ${response.status} - ${response.data}`,
             );
             return;
         }
 
-        return (await response.json()) as CurrentTimeEntry;
+        return response.data;
     } catch (error) {
         logger.warn(error);
         return;
@@ -118,52 +99,36 @@ export async function startTimeEntry(
 }
 
 export async function stopTimeEntry(timeEntry: CurrentTimeEntry) {
-    const response = await fetch(
-        `${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries/${timeEntry.id}/stop`,
-        {
-            method: "PATCH",
-            headers,
-        },
+    const response = await client.patch<CurrentTimeEntry>(
+        `workspaces/${timeEntry.workspace_id}/time_entries/${timeEntry.id}/stop`,
     );
 
-    return (await response.json()) as CurrentTimeEntry;
+    return response.data;
 }
 
-export async function updateTimeEntry(timeEntry: CurrentTimeEntry) {
-    const response = await fetch(
-        `${WORKSPACES_URL}/${timeEntry.workspace_id}/time_entries/${timeEntry.id}`,
-        {
-            method: "PUT",
-            headers,
-            body: JSON.stringify(timeEntry),
-        },
+export async function updateTimeEntry(
+    timeEntry: CurrentTimeEntry,
+): Promise<CurrentTimeEntry> {
+    const response = await client.put<CurrentTimeEntry>(
+        `workspaces/${timeEntry.workspace_id}/time_entries/${timeEntry.id}`,
+        timeEntry,
     );
 
-    if (!response.ok) {
-        throw new Error(
-            `Unable to update time entry: \n${await response.text()}`,
-        );
+    if (response.status !== HttpStatusCode.Ok) {
+        throw new Error(`Unable to update time entry: \n${response.data}`);
     }
 
-    return (await response.json()) as CurrentTimeEntry;
+    return response.data;
 }
 
 export async function workspaces(): Promise<Workspace[]> {
-    const response = await fetch(`${ME_URL}/workspaces`, {
-        headers,
-    });
-
-    const json = await response.json();
-    return json as Workspace[];
+    const response = await client.get("me/workspaces");
+    return response.data;
 }
 
 export async function clients(workspace?: string): Promise<Client[]> {
-    const url = workspace
-        ? `${WORKSPACES_URL}/workspaces/${workspace}/clients`
-        : `${ME_URL}/clients`;
-    const response = await fetch(url, {
-        headers,
-    });
+    const url = workspace ? `workspaces/${workspace}/clients` : "me/clients";
 
-    return (await response.json()) as Client[];
+    const response = await client.get<Client[]>(url);
+    return response.data;
 }
