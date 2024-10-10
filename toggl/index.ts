@@ -4,9 +4,11 @@ import type { CurrentTimeEntry } from "./types";
 
 import { logger } from "@/logging";
 import { sendCommand } from "@/server";
+import { parse, parseISO } from "date-fns";
 import { getTicket } from "../jira";
 import { waitForOnlineState } from "../network";
 import * as client from "./client";
+import { getReport } from "./reports";
 
 let currentTimeEntry: CurrentTimeEntry | undefined;
 
@@ -181,4 +183,11 @@ command
             number: parsedTicketNumber,
             name: "meeting",
         });
+    });
+
+command
+    .command("print-report")
+    .option("-s,--since <DATE>")
+    .action(async (opts: { since?: string }) => {
+        await getReport(opts);
     });

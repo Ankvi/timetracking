@@ -59,7 +59,7 @@ export type CurrentTimeEntry = {
     duration?: number;
     id: number;
     project_id?: Project["id"];
-    project_name?: string;
+    project_name?: Project["name"];
     start: string;
     stop?: string;
     tags: string[];

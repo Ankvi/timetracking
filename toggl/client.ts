@@ -1,5 +1,6 @@
 import { logger } from "@/logging";
 import axios, { HttpStatusCode } from "axios";
+import { getUnixTime } from "date-fns";
 import type {
     Client,
     CurrentTimeEntry,
@@ -130,5 +131,22 @@ export async function clients(workspace?: string): Promise<Client[]> {
     const url = workspace ? `workspaces/${workspace}/clients` : "me/clients";
 
     const response = await client.get<Client[]>(url);
+    return response.data;
+}
+
+export async function getTimeEntries(
+    since?: Date,
+): Promise<CurrentTimeEntry[]> {
+    const params: Record<string, string | number | boolean> = {
+        meta: true,
+    };
+    if (since) {
+        params.since = getUnixTime(since);
+    }
+
+    const response = await client.get<CurrentTimeEntry[]>("me/time_entries", {
+        params,
+    });
+
     return response.data;
 }
