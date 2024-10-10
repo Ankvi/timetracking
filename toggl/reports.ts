@@ -1,5 +1,10 @@
 import { type ObjectEnum, TaskType, Team } from "@/types";
-import { addSeconds, formatDistance, getISOWeek } from "date-fns";
+import {
+    addSeconds,
+    differenceInHours,
+    formatDistance,
+    getISOWeek,
+} from "date-fns";
 import { parseISO } from "date-fns/parseISO";
 import { getTimeEntries } from "./client";
 
@@ -14,8 +19,12 @@ const TimeType = {
 
 type TimeType = ObjectEnum<typeof TimeType>;
 
-type TeamWeekReport = { [key in Team]?: WeekReport };
-type WeekReport = Record<TimeType, number>;
+type WeekReport = {
+    teams: { [key in Team]?: TeamWeekReport };
+    totalDuration: number;
+};
+
+type TeamWeekReport = Record<TimeType, number>;
 
 const timeTypeMap = {
     [TaskType.Feature]: TimeType.CapEx,
@@ -26,10 +35,8 @@ const timeTypeMap = {
     [TaskType.Other]: TimeType.OpEx,
 };
 
-const secondsInHour = 60 * 60;
-
 export async function getReport(opts: GetReportOpts) {
-    const report = new Map<number, TeamWeekReport>();
+    const report = new Map<number, WeekReport>();
 
     let since: Date | undefined;
     if (opts.since) {
@@ -45,12 +52,15 @@ export async function getReport(opts: GetReportOpts) {
 
         let weekReport = report.get(weekNumber);
         if (!weekReport) {
-            weekReport = {};
+            weekReport = {
+                teams: {},
+                totalDuration: 0,
+            };
             report.set(weekNumber, weekReport);
         }
 
-        if (!weekReport[project]) {
-            weekReport[project] = {
+        if (!weekReport.teams[project]) {
+            weekReport.teams[project] = {
                 CapEx: 0,
                 OpEx: 0,
             };
@@ -59,27 +69,35 @@ export async function getReport(opts: GetReportOpts) {
         for (const tag of entry.tags) {
             const timeType: TimeType | undefined = timeTypeMap[tag as TaskType];
             if (timeType) {
-                weekReport[project][timeType] += entry.duration ?? 0;
+                weekReport.teams[project][timeType] += entry.duration ?? 0;
+                weekReport.totalDuration += entry.duration ?? 0;
             }
         }
     }
-    console.log(report);
+    // console.log(report);
 
     const referenceDate = new Date();
 
-    for (const [week, teamReport] of report.entries()) {
-        console.log(`Week: ${week}`);
-        for (const [team, weekReport] of Object.entries(teamReport)) {
+    for (const [week, weekReport] of report.entries()) {
+        const weekTotal = addSeconds(referenceDate, weekReport.totalDuration);
+        const weekDifference = differenceInHours(weekTotal, referenceDate);
+
+        console.log("----------------------------------");
+        console.log(`Week: ${week} (total duration: ${weekDifference}h)`);
+
+        for (const team of Object.values(Team)) {
+            const teamWeekReport = weekReport.teams[team];
+            if (!teamWeekReport) {
+                continue;
+            }
+
             console.log(team);
-            for (const [type, duration] of Object.entries(weekReport)) {
+            for (const [type, duration] of Object.entries(teamWeekReport)) {
                 const end = addSeconds(referenceDate, duration);
-                const difference = formatDistance(end, referenceDate);
-                // const hours = duration % secondsInHour;
-                // const minutes = (duration - hours * secondsInHour) % 60;
-                // console.log(`${type}: ${hours}h ${minutes}m`);
-                console.log(`${type}: ${difference}`);
+                const difference = differenceInHours(end, referenceDate);
+
+                console.log(`${type}: ${difference}h`);
             }
         }
-        console.log("______________________");
     }
 }
