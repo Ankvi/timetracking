@@ -66,7 +66,7 @@ export async function waitForOnlineState(operation: string): Promise<true> {
 
         retries++;
 
-        await Bun.sleep(1000);
+        await Bun.sleep(2000);
     }
 
     if (!online) {
