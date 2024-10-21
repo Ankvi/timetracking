@@ -9,6 +9,7 @@ import {
 } from "bun:test";
 import * as toggl from "..";
 import type * as jira from "../../jira";
+import type { TicketInfo } from "../../jira/types";
 import type * as client from "../client";
 import type { CurrentTimeEntry, Project, User, Workspace } from "../types";
 
@@ -60,12 +61,16 @@ const mockedClient: Mocked<Client> = {
     stopTimeEntry: mock(),
     updateTimeEntry: mock(),
     getCurrentTimeEntry: mock(),
+    getTimeEntries: mock(),
 };
 
 const mockedJira: Mocked<Jira> = {
     getTicket: mock(() =>
-        Promise.resolve({
+        Promise.resolve<TicketInfo>({
             id: "id",
+            issueType: {
+                name: "Epic",
+            },
             key: "OTHER-1337",
             self: "self?",
             fields: {
@@ -74,6 +79,7 @@ const mockedJira: Mocked<Jira> = {
             },
         }),
     ),
+    addTrackedTime: mock(),
 };
 
 describe("Toggl tests", () => {
