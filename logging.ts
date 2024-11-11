@@ -6,11 +6,17 @@ const { combine, timestamp, json, errors } = format;
 
 export const logger = createLogger({
     level: "info",
-    format: combine(errors({ stack: true }), timestamp(), json()),
     transports: [
-        new transports.Console(),
+        new transports.Console({
+            format: combine(
+                errors({ stack: true }),
+                timestamp(),
+                json({ space: 4 }),
+            ),
+        }),
         new transports.File({
             filename: LOG_FILE,
+            format: combine(errors({ stack: true }), timestamp(), json()),
         }),
     ],
 });
