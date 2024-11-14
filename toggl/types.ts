@@ -63,6 +63,7 @@ export type CurrentTimeEntry = {
     start: string;
     stop?: string;
     tags: string[];
+    tag_ids?: ExtraTimeEntryFields["tag_ids"];
     workspace_id: Workspace["id"];
 };
 

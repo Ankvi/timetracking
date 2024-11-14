@@ -1,7 +1,18 @@
 import axios from "axios";
-import { differenceInSeconds } from "date-fns";
+import {
+    differenceInSeconds,
+    format,
+    formatISO,
+    formatISO9075,
+} from "date-fns";
 import type { Team } from "../types";
-import type { Ticket, TicketInfo, TimeTrackRequest } from "./types";
+import type {
+    AddTrackedTimeRequest,
+    Ticket,
+    TicketInfo,
+    TimeTrackRequest,
+    TrackedTimeResponse,
+} from "./types";
 
 const BASE_URL = "https://elkjop.atlassian.net/rest/api/3";
 
@@ -35,13 +46,52 @@ export async function getTicket(
     return ticket;
 }
 
-export async function addTrackedTime(ticket: Ticket, start: Date, end: Date) {
-    const seconds = differenceInSeconds(end, start);
+export async function getTrackedTime(
+    ticket: Ticket,
+): Promise<TrackedTimeResponse> {
+    const response = await client.get<TrackedTimeResponse>(
+        `issue/${ticket}/worklog`,
+    );
+    return response.data;
+}
+
+export async function addTrackedTime({
+    ticket,
+    timeEntryId,
+    description,
+    start,
+    stop,
+}: AddTrackedTimeRequest) {
+    const seconds = differenceInSeconds(stop, start);
+
+    if (!seconds) {
+        return;
+    }
 
     const body: TimeTrackRequest = {
-        started: start.toISOString(),
+        started: format(start, "yyyy-MM-dd'T'HH:mm:ss.SSSxxxx"),
         timeSpentSeconds: seconds,
+        comment: {
+            type: "doc",
+            version: 1,
+            content: [
+                {
+                    type: "paragraph",
+                    content: [
+                        {
+                            type: "text",
+                            text: timeEntryId.toString(),
+                        },
+                        {
+                            type: "text",
+                            text: description,
+                        },
+                    ],
+                },
+            ],
+        },
     };
+    // console.log(body);
 
     await client.post(`issue/${ticket}/worklog`, body);
 }
