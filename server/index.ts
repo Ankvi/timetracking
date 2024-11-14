@@ -13,15 +13,24 @@ export type ServerOpts = {
     socketPath: string;
 };
 
+async function stopExistingServers(socketPath: string) {
+    const attempts = 0;
+    while (attempts < 3) {
+        if (!existsSync(socketPath)) {
+            return;
+        }
+        logger.info("Server already running. Attempting to stop");
+        await sendCommand("shutdown", undefined, { socketPath });
+        await Bun.sleep(200);
+    }
+}
+
 export async function start({ socketPath }: ServerOpts) {
     if (!existsSync(CACHE_FOLDER)) {
         await mkdir(CACHE_FOLDER, { recursive: true });
     }
 
-    if (existsSync(socketPath)) {
-        logger.info("Server already running. Exiting");
-        process.exit(0);
-    }
+    await stopExistingServers(socketPath);
 
     const server = Bun.serve({
         unix: socketPath,
