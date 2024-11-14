@@ -19,9 +19,16 @@ async function stopExistingServers(socketPath: string) {
         if (!existsSync(socketPath)) {
             return;
         }
-        logger.info("Server already running. Attempting to stop");
-        await sendCommand("shutdown", undefined, { socketPath });
-        await Bun.sleep(200);
+        try {
+            logger.info("Server already running. Attempting to stop");
+            await sendCommand("shutdown", undefined, { socketPath });
+            await Bun.sleep(200);
+        } catch (error) {
+            if (error instanceof ServerNotRunningError) {
+                return;
+            }
+            throw error;
+        }
     }
 }
 
