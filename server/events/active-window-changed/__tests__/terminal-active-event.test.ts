@@ -22,7 +22,10 @@ describe("extractBranchInfo tests", () => {
     ])(
         "%p should exact %p, %p, %p and %p",
         (branch, type, team, ticketNumber, name) => {
-            const branchInfo = extractBranchInfo(branch);
+            const branchInfo = extractBranchInfo(
+                "/home/USER/git/github.com/elkjopnordic/CID/App1",
+                branch,
+            );
             expect(branchInfo).toBeTruthy();
             expect(branchInfo).toStrictEqual({
                 type,
@@ -30,6 +33,41 @@ describe("extractBranchInfo tests", () => {
                 ticketNumber,
                 name,
                 fullName: branch,
+            });
+        },
+    );
+
+    test.each([
+        ["/home/USER/git/github.com/elkjopnordic/CID/App1", "develop"],
+        ["/home/USER/git/github.com/elkjopnordic/CID/App2", "main"],
+    ])(
+        "Working in the a main branch of anything in the CID folder should start an OTHER task of CID",
+        (directory, branch) => {
+            const branchInfo = extractBranchInfo(directory, branch);
+            expect(branchInfo).toStrictEqual({
+                team: Team.CustomerIdentity,
+                ticketNumber: 0,
+                type: TaskType.Other,
+                fullName: directory,
+                name: directory,
+            });
+        },
+    );
+
+    test.each([
+        ["/home/USER/git/github.com/Ankvi/CID/App1", "develop"],
+        ["/home/USER/git/github.com/Ankvi/dotfiles", "main"],
+        ["/home/USER/git/github.com/Ankvi/timetracking", "some-feature"],
+    ])(
+        "Working in a branch of anything not in the elkjopnordic folder should start a private OTHER task",
+        (directory, branch) => {
+            const branchInfo = extractBranchInfo(directory, branch);
+            expect(branchInfo).toStrictEqual({
+                team: Team.Other,
+                ticketNumber: 0,
+                type: TaskType.Other,
+                fullName: directory,
+                name: directory,
             });
         },
     );

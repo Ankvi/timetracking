@@ -2,7 +2,7 @@ import { logger } from "@/logging";
 import { getProject } from "@/tmux/titles";
 import type { TmuxPaneTitle } from "@/tmux/types";
 import { startTimer } from "@/toggl";
-import { type Branch, TaskType, type Team } from "@/types";
+import { type Branch, TaskType, Team } from "@/types";
 
 type BranchInfo = {
     fullName: Branch;
@@ -16,7 +16,40 @@ type BranchInfo = {
 // const branchTester = /^([a-z]+)\/([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
 const branchTester = /(?:([a-z]+)\/)?([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
 
-export function extractBranchInfo(branch: Branch): BranchInfo | null {
+const mainBranches = ["main", "master", "develop"];
+
+function getTeamOfDirectory(directory: string): Team {
+    if (directory.includes("CID")) {
+        return Team.CustomerIdentity;
+    }
+
+    return Team.Flash;
+}
+
+export function extractBranchInfo(
+    directory: string,
+    branch: Branch,
+): BranchInfo | null {
+    if (!directory.includes("github.com/elkjopnordic")) {
+        return {
+            fullName: directory,
+            name: directory,
+            type: TaskType.Other,
+            ticketNumber: 0,
+            team: Team.Other,
+        };
+    }
+
+    if (mainBranches.includes(branch)) {
+        return {
+            fullName: directory,
+            name: directory,
+            type: TaskType.Other,
+            ticketNumber: 0,
+            team: getTeamOfDirectory(directory),
+        };
+    }
+
     const result = branchTester.exec(branch);
     if (!result) {
         logger.debug(
@@ -35,8 +68,6 @@ export function extractBranchInfo(branch: Branch): BranchInfo | null {
     };
 }
 
-let currentBranch: Branch | null;
-
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
     logger.debug("Got terminal active event");
     const { directory, branch } = getProject(title);
@@ -48,11 +79,7 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
         return;
     }
 
-    if (branch === currentBranch) {
-        logger.debug("Same branch as current. Skipping");
-    }
-
-    const branchInfo = extractBranchInfo(branch);
+    const branchInfo = extractBranchInfo(directory, branch);
     if (!branchInfo) {
         return;
     }
