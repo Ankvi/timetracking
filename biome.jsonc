@@ -14,7 +14,8 @@
     },
     "formatter": {
         "enabled": true,
-        "indentWidth": 4,
-        "indentStyle": "space"
+        "formatWithErrors": false,
+        "attributePosition": "auto",
+        "useEditorconfig": true
     }
 }
