@@ -12,6 +12,13 @@ describe("extractBranchInfo tests", () => {
             "something",
         ],
         [
+            "feature/CID-10000-something-longer",
+            TaskType.Feature,
+            Team.CustomerIdentity,
+            10000,
+            "something-longer",
+        ],
+        [
             "CID-10000-something",
             TaskType.Other,
             Team.CustomerIdentity,

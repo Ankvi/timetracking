@@ -13,7 +13,7 @@ type BranchInfo = {
 };
 
 // Captures the branch type, team, ticket number and name of a branch
-const branchTester = /^(?:([a-z]+)\/)?([A-Z]+)-(\d+)(?:-(\w+))?$/;
+const branchTester = /^(?:([a-z]+)\/)?([A-Z]+)-(\d+)(?:-(.+))*$/;
 
 const mainBranches = ["main", "master", "develop"];
 
