@@ -26,6 +26,8 @@ export const Team = {
     Other: "OTHER",
 } as const;
 
+export const Teams = Object.values(Team);
+
 export type Team = ObjectEnum<typeof Team>;
 
 export class ServerNotRunningError extends Error {}

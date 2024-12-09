@@ -80,6 +80,7 @@ const mockedJira: Mocked<Jira> = {
         }),
     ),
     addTrackedTime: mock(),
+    getTrackedTime: mock(),
 };
 
 describe("Toggl tests", () => {

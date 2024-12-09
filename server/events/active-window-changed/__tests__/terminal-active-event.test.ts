@@ -19,6 +19,7 @@ describe("extractBranchInfo tests", () => {
             "something",
         ],
         ["OTHER-1-something", TaskType.Other, Team.Other, 1, "something"],
+        ["FLASH-1000", TaskType.Other, Team.Flash, 1000, "Unknown"],
     ])(
         "%p should exact %p, %p, %p and %p",
         (branch, type, team, ticketNumber, name) => {

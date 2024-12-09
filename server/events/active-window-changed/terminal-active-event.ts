@@ -2,7 +2,7 @@ import { logger } from "@/logging";
 import { getProject } from "@/tmux/titles";
 import type { TmuxPaneTitle } from "@/tmux/types";
 import { startTimer } from "@/toggl";
-import { type Branch, TaskType, Team } from "@/types";
+import { type Branch, TaskType, Team, Teams } from "@/types";
 
 type BranchInfo = {
     fullName: Branch;
@@ -13,8 +13,7 @@ type BranchInfo = {
 };
 
 // Captures the branch type, team, ticket number and name of a branch
-// const branchTester = /^([a-z]+)\/([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
-const branchTester = /(?:([a-z]+)\/)?([A-Z]+)-(\d+)-([a-zA-Z0-9-]+)$/;
+const branchTester = /^(?:([a-z]+)\/)?([A-Z]+)-(\d+)(?:-(\w+))?$/;
 
 const mainBranches = ["main", "master", "develop"];
 
@@ -52,19 +51,18 @@ export function extractBranchInfo(
 
     const result = branchTester.exec(branch);
     if (!result) {
-        logger.debug(
-            "Branch did not match requirements for a toggl timer. Private project?",
-        );
+        logger.debug("Branch did not match requirements for a toggl timer.");
         return null;
     }
 
     const [fullName, type, team, ticketNumber, name] = result;
+
     return {
         fullName,
         type: (type as TaskType) ?? TaskType.Other,
-        team: team as Team,
+        team: (team as Team) ?? Team.Other,
         ticketNumber: Number.parseInt(ticketNumber, 10),
-        name,
+        name: name ?? "Unknown",
     };
 }
 
