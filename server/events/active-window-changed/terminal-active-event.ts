@@ -66,7 +66,11 @@ export function extractBranchInfo(
     };
 }
 
-let debouncedTimerStart: NodeJS.Timeout | undefined;
+let debouncedTimerStart: NodeJS.Timer | undefined;
+
+process.on("SIGINT", () => {
+    clearTimeout(debouncedTimerStart);
+});
 
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
     logger.debug("Got terminal active event");
@@ -87,12 +91,10 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
     logger.debug(branchInfo);
     const { type, team, ticketNumber, name } = branchInfo;
 
-    if (debouncedTimerStart) {
-        clearTimeout(debouncedTimerStart);
-    }
+    clearTimeout(debouncedTimerStart);
 
     debouncedTimerStart = setTimeout(async () => {
         await startTimer(type, team, ticketNumber, name);
         debouncedTimerStart = undefined;
-    }, 3000) as NodeJS.Timeout;
+    }, 3000);
 }
