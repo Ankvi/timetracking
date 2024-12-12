@@ -31,8 +31,8 @@ export function extractBranchInfo(
 ): BranchInfo | null {
     if (!directory.includes("github.com/elkjopnordic")) {
         return {
-            fullName: directory,
-            name: directory,
+            fullName: "private project",
+            name: "private project",
             type: TaskType.Other,
             ticketNumber: 0,
             team: Team.Other,
@@ -66,6 +66,8 @@ export function extractBranchInfo(
     };
 }
 
+let debouncedTimerStart: NodeJS.Timeout | undefined;
+
 export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
     logger.debug("Got terminal active event");
     const { directory, branch } = getProject(title);
@@ -84,5 +86,13 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
 
     logger.debug(branchInfo);
     const { type, team, ticketNumber, name } = branchInfo;
-    await startTimer(type, team, ticketNumber, name);
+
+    if (debouncedTimerStart) {
+        clearTimeout(debouncedTimerStart);
+    }
+
+    debouncedTimerStart = setTimeout(async () => {
+        await startTimer(type, team, ticketNumber, name);
+        debouncedTimerStart = undefined;
+    }, 3000) as NodeJS.Timeout;
 }

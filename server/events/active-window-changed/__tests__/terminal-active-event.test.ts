@@ -74,8 +74,8 @@ describe("extractBranchInfo tests", () => {
                 team: Team.Other,
                 ticketNumber: 0,
                 type: TaskType.Other,
-                fullName: directory,
-                name: directory,
+                fullName: "private project",
+                name: "private project",
             });
         },
     );
