@@ -96,5 +96,5 @@ export async function handleTerminalActiveEvent(title: TmuxPaneTitle) {
     debouncedTimerStart = setTimeout(async () => {
         await startTimer(type, team, ticketNumber, name);
         debouncedTimerStart = undefined;
-    }, 3000);
+    }, 10000);
 }
