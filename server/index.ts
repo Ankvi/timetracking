@@ -102,7 +102,8 @@ export async function sendCommand<T extends keyof EventPayloads>(
         });
     } catch (error) {
         if (error instanceof Error) {
-            if (error.name === "FailedToOpenSocket") {
+            const code = "code" in error ? error.code : error.name;
+            if (code === "FailedToOpenSocket") {
                 logger.info("Timetracking server is currently not running");
                 throw new ServerNotRunningError();
             }
