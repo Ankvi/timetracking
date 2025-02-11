@@ -14,7 +14,7 @@ export type ServerOpts = {
 };
 
 async function stopExistingServers(socketPath: string) {
-    const attempts = 0;
+    let attempts = 0;
     while (attempts < 3) {
         if (!existsSync(socketPath)) {
             return;
@@ -25,9 +25,12 @@ async function stopExistingServers(socketPath: string) {
             await Bun.sleep(200);
         } catch (error) {
             if (error instanceof ServerNotRunningError) {
+                if (existsSync(socketPath)) {
+                    await rm(socketPath);
+                }
                 return;
             }
-            throw error;
+            attempts++;
         }
     }
 }
