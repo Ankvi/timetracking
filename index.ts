@@ -4,9 +4,8 @@ import { Command } from "commander";
 import { logger, logging } from "./logging";
 import { DEFAULT_SERVER_SOCKET } from "./program-data";
 import * as server from "./server";
-import * as tmux from "./tmux";
 import * as toggl from "./toggl";
-import { ServerNotRunningError, Team } from "./types";
+import { Team } from "./types";
 import * as windowManagers from "./window-manager-sockets";
 import type { WindowManager } from "./window-manager-sockets/types";
 
@@ -42,15 +41,12 @@ program
 
         const wmSocket = await windowManagers.connect(args.manager);
 
-        // const tmuxProcess = tmux.start();
-
         async function cleanup() {
             await toggl
                 .stopTimer()
                 .catch(() => logger.warn("Stopping timer failed"));
             await wmSocket.terminate();
             await serverSocket.stop();
-            // tmuxProcess.kill();
         }
 
         process.on("SIGINT", cleanup);
